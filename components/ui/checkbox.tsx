@@ -3,54 +3,67 @@
 import * as React from 'react';
 import MuiCheckbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { styled } from '@mui/material/styles';
 
-import { cn } from '@/lib/utils';
-
-interface CheckboxProps extends Omit<React.ComponentProps<typeof MuiCheckbox>, 'onChange'> {
+interface CheckboxProps {
   className?: string;
   label?: string;
+  checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
 }
-
-const StyledCheckbox = styled(MuiCheckbox)(({ theme }) => ({
-  padding: theme.spacing(0.5),
-  '&.Mui-checked': {
-    color: theme.palette.primary.main,
-  },
-  '&.MuiCheckbox-root': {
-    color: theme.palette.text.primary,
-  },
-}));
 
 const Checkbox = React.forwardRef<
   HTMLInputElement,
   CheckboxProps
->(({ className, label, onCheckedChange, ...props }, ref) => {
+>(({ className, label, checked, onCheckedChange, disabled, ...props }, ref) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (onCheckedChange) {
       onCheckedChange(event.target.checked);
     }
   };
 
+  // استخدام MUI Checkbox مباشرة مع props المناسبة
   const checkbox = (
-    <StyledCheckbox
-      ref={ref}
-      className={cn(
-        'peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
+    <MuiCheckbox
+      checked={checked}
       onChange={handleChange}
+      disabled={disabled}
+      sx={{
+        '&.MuiCheckbox-root': {
+          color: '#94A3B8',
+        },
+        '&.Mui-checked': {
+          color: '#1E40AF !important', // أزرق داكن
+        },
+        '&.Mui-checked .MuiSvgIcon-root': {
+          color: '#1E40AF !important', // للتأكيد على تطبيق اللون
+        },
+        '&:hover': {
+          backgroundColor: 'rgba(37, 99, 235, 0.08)',
+        },
+      }}
+      className={className}
       {...props}
     />
   );
 
   if (label) {
-    return <FormControlLabel control={checkbox} label={label} />;
+    return (
+      <FormControlLabel 
+        control={checkbox} 
+        label={label}
+        sx={{
+          '& .MuiFormControlLabel-label': {
+            fontSize: '0.875rem',
+          }
+        }}
+      />
+    );
   }
 
   return checkbox;
 });
+
 Checkbox.displayName = 'Checkbox';
 
 export { Checkbox };
