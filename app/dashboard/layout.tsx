@@ -6,7 +6,8 @@ import {
   LogOut,
   Search,
   Bell, 
-  Clock
+  Clock,
+  TicketIcon
 } from 'lucide-react'
 
 export default function DashboardLayout({
@@ -46,6 +47,14 @@ export default function DashboardLayout({
               >
                 <Home className="h-5 w-5 ml-3 text-dashboard-accent" />
                 <span>لوحة التحكم</span>
+              </Link>
+              
+              <Link
+                href="/dashboard/generate"
+                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
+              >
+                <TicketIcon className="h-5 w-5 ml-3 text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors" />
+                <span>توليد رموز الدعوة</span>
               </Link>
               
               <Link

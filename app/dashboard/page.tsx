@@ -68,7 +68,7 @@ export default function DashboardPage() {
     fetchInviteCodes, 
     addInviteCode, 
     updateInviteCode, 
-    deleteInviteCode 
+    deleteInviteCode
   } = useInviteStore()
   
   const [newCode, setNewCode] = useState('')
@@ -76,6 +76,12 @@ export default function DashboardPage() {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // حالة لمربع الحوار التأكيدي
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<{open: boolean, codeId: string | null}>({
+    open: false,
+    codeId: null
+  })
   
   useEffect(() => {
     fetchInviteCodes()
@@ -100,6 +106,7 @@ export default function DashboardPage() {
   }
   
   const handleDeleteCode = async (id: string) => {
+    setDeleteDialogOpen({open: false, codeId: null})
     await deleteInviteCode(id)
   }
   
@@ -314,7 +321,10 @@ export default function DashboardPage() {
                       </TableCell>
                       <TableCell className="text-left">
                         <div className="flex justify-end gap-2">
-                          <AlertDialog>
+                          <AlertDialog 
+                            open={deleteDialogOpen.open && deleteDialogOpen.codeId === code.id} 
+                            onOpenChange={(open) => setDeleteDialogOpen({open, codeId: open ? code.id : null})}
+                          >
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="ghost"
