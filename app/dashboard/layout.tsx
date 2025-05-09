@@ -2,8 +2,9 @@
 
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/lib/store/auth-store'
 import { 
   Home, 
   LogOut,
@@ -19,6 +20,13 @@ export default function DashboardLayout({
   children: ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { logout } = useAuthStore()
+  
+  const handleLogout = () => {
+    logout()
+    router.push('/login')
+  }
 
   return (
     <div className="min-h-screen bg-dashboard-bg text-dashboard-text">
@@ -82,13 +90,13 @@ export default function DashboardLayout({
                 <span>توليد رموز الدعوة</span>
               </Link>
               
-              <Link
-                href="/"
-                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group w-full text-right"
               >
-                <LogOut className="h-5 w-5 ml-3 text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors" />
-                <span>تسجيل الخروج</span>
-              </Link>
+                <LogOut className="h-5 w-5 ml-3 text-dashboard-text-muted group-hover:text-red-500 transition-colors" />
+                <span className="group-hover:text-red-500 transition-colors">تسجيل الخروج</span>
+              </button>
             </div>
           </div>
         </div>
@@ -101,7 +109,7 @@ export default function DashboardLayout({
               {/* Mobile Menu Button (if needed) */}
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
               <button className="text-dashboard-text-muted hover:text-dashboard-accent p-2 rounded-full hover:bg-dashboard-bg transition-colors">
                 <Clock className="w-5 h-5" />
               </button>
@@ -110,8 +118,14 @@ export default function DashboardLayout({
                 <span className="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full"></span>
               </button>
               <div className="h-10 w-10 bg-primary-100 rounded-full overflow-hidden flex items-center justify-center shadow-sm border border-primary-200">
-                <span className="text-primary-600 font-semibold text-sm">JD</span>
+                <span className="text-primary-600 font-semibold text-sm">AD</span>
               </div>
+              <button 
+                onClick={handleLogout}
+                className="text-dashboard-text-muted hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
           </header>
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 type AuthStore = {
   isLoggedIn: boolean
@@ -16,6 +16,10 @@ export const useAuthStore = create<AuthStore>()(
         // تحقق من بيانات تسجيل الدخول المحددة مسبقًا
         if (username === 'admin' && password === '123456') {
           set({ isLoggedIn: true })
+          // حفظ حالة تسجيل الدخول في localStorage بشكل مباشر أيضًا للتأكيد
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user-logged-in', 'true')
+          }
           return true
         }
         return false
@@ -23,10 +27,16 @@ export const useAuthStore = create<AuthStore>()(
       
       logout: () => {
         set({ isLoggedIn: false })
+        // إزالة العنصر من localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('user-logged-in')
+        }
       }
     }),
     {
       name: 'auth-storage', // اسم المفتاح في localStorage
+      storage: createJSONStorage(() => localStorage),
+      skipHydration: false, // تحميل فوري للبيانات
     }
   )
 ) 
