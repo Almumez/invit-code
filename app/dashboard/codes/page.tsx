@@ -154,120 +154,95 @@ export default function InviteCodesPage() {
   const scannedCodes = inviteCodes.filter(code => !code.isActive).length
   
   return (
-    <div className="space-y-8">
-      {/* Header & Statistics */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <Card className="materio-card h-full">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="text-dashboard-text-muted text-sm font-medium mb-1">إجمالي الرموز</div>
-                  <div className="text-3xl font-bold text-dashboard-text mb-2">
-                    {totalCodes}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      الرموز النشطة: {activeCodes}
-                    </Badge>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      الرموز المستخدمة: {scannedCodes}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="materio-gradient-primary w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
-                  <TicketIcon className="w-6 h-6 text-white" />
-                </div>
+    <div className="space-y-6">
+      {/* Header Card */}
+      <Card className="materio-card">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center">
+              <div className="materio-gradient-primary w-10 h-10 rounded-lg flex items-center justify-center shadow-sm mr-4">
+                <TicketIcon className="w-5 h-5 text-white" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="lg:col-span-3">
-          <Card className="materio-card h-full">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center">
-                  <h1 className="text-xl font-bold text-dashboard-text">إدارة رموز الدعوة</h1>
-                  <p className="text-dashboard-text-muted text-sm mr-2">
-                    إدارة وتتبع رموز الدعوة
-                  </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative">
-                    <Input
-                      placeholder="البحث عن رموز..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-dashboard-bg border-dashboard-border text-dashboard-text pr-10 w-full sm:w-64 text-right"
-                    />
-                    <SearchIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dashboard-text-muted" />
+              <div>
+                <h1 className="text-xl font-bold text-dashboard-text">إدارة رموز الدعوة</h1>
+                <p className="text-dashboard-text-muted text-sm">
+                  إدارة وتتبع {totalCodes} رمز دعوة ({activeCodes} نشط, {scannedCodes} مستخدم)
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative">
+                <Input
+                  placeholder="البحث عن رموز..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-dashboard-bg border-dashboard-border text-dashboard-text pr-10 w-full sm:w-64 text-right"
+                />
+                <SearchIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dashboard-text-muted" />
+              </div>
+              
+              <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+                <Button className="bg-dashboard-accent hover:bg-dashboard-accent-hover text-white shadow-sm" onClick={() => setAddDialogOpen(true)}>
+                  <PlusIcon className="h-4 w-4 ml-2" />
+                  رمز جديد
+                </Button>
+                <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">إضافة رمز دعوة جديد</DialogTitle>
+                    <DialogDescription className="text-dashboard-text-muted">
+                      قم بإنشاء رمز دعوة جديد للمستخدمين
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="new-code">رمز الدعوة</Label>
+                      <Input
+                        id="new-code"
+                        placeholder="أدخل رمز الدعوة"
+                        value={newCode}
+                        onChange={(e) => setNewCode(e.target.value)}
+                        className="bg-dashboard-bg border-dashboard-border text-dashboard-text focus:ring-primary-500/50 text-right"
+                      />
+                    </div>
                   </div>
-                  
-                  <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-                    <Button className="bg-dashboard-accent hover:bg-dashboard-accent-hover text-white shadow-sm" onClick={() => setAddDialogOpen(true)}>
-                      <PlusIcon className="h-4 w-4 ml-2" />
-                      رمز جديد
+                  <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2">
+                    <Button 
+                      onClick={handleAddCode}
+                      className="bg-primary-500 hover:bg-primary-600 text-white"
+                    >
+                      إضافة الرمز
                     </Button>
-                    <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text">
-                      <DialogHeader>
-                        <DialogTitle className="text-xl">إضافة رمز دعوة جديد</DialogTitle>
-                        <DialogDescription className="text-dashboard-text-muted">
-                          قم بإنشاء رمز دعوة جديد للمستخدمين
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="new-code">رمز الدعوة</Label>
-                          <Input
-                            id="new-code"
-                            placeholder="أدخل رمز الدعوة"
-                            value={newCode}
-                            onChange={(e) => setNewCode(e.target.value)}
-                            className="bg-dashboard-bg border-dashboard-border text-dashboard-text focus:ring-primary-500/50 text-right"
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2">
-                        <Button 
-                          onClick={handleAddCode}
-                          className="bg-primary-500 hover:bg-primary-600 text-white"
-                        >
-                          إضافة الرمز
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setAddDialogOpen(false)}
-                          className="bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                        >
-                          إلغاء
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setAddDialogOpen(false)}
+                      className="bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+                    >
+                      إلغاء
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
       {/* Main Card */}
       <Card className="bg-white shadow-sm border-dashboard-border">
         <CardHeader className="border-b border-dashboard-border bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="flex items-center text-lg font-semibold text-dashboard-text">
                 <TicketIcon className="h-5 w-5 ml-2 text-primary-500" />
                 رموز الدعوة
               </CardTitle>
-              <CardDescription className="text-dashboard-text-muted">
+              <CardDescription className="text-dashboard-text-muted mt-1">
                 عرض وتعديل وحذف رموز الدعوة الخاصة بك
               </CardDescription>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-3 sm:mt-0">
               <div className="flex items-center">
                 <FilterIcon className="h-4 w-4 ml-2 text-dashboard-text-muted" />
                 <Select
