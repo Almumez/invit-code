@@ -156,7 +156,7 @@ export default function DashboardLayout({
                   className="inline-flex items-center justify-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-primary-200 text-sm text-primary-600 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors shadow-sm"
                 >
                   <Globe className="h-3.5 w-3.5" />
-                  <span>معرض الأعمال</span>
+                  <span>بوابة التواصل</span>
                 </a>
               </div>
             </div>
