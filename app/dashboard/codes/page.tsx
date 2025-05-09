@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
 import { 
   Card, 
@@ -173,20 +173,6 @@ export default function InviteCodesPage() {
     return format(new Date(date), 'dd MMM yyyy', { locale: arSA })
   }
 
-  // المكون الخاص بزر الصفحة
-  const PaginationButton = ({ page, isActive, onClick }: { page: number, isActive: boolean, onClick: () => void }) => (
-    <Button
-      variant={isActive ? "default" : "outline"}
-      size="sm"
-      onClick={onClick}
-      className={`h-8 w-8 p-0 ${isActive 
-        ? 'bg-primary-500 hover:bg-primary-600 text-white' 
-        : 'bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg'}`}
-    >
-      {page}
-    </Button>
-  )
-  
   // حساب معدل النمو
   const calculateGrowthRate = (current: number, previous: number): string => {
     if (previous === 0) return '0%';
@@ -197,122 +183,128 @@ export default function InviteCodesPage() {
   return (
     <div className="space-y-6">
       {/* Header Card */}
-      <Card className="materio-card">
+      <Card className="border-0 bg-gradient-to-r from-primary-500/90 to-primary-700 text-white shadow-lg">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center">
-              <div className="materio-gradient-primary w-10 h-10 rounded-lg flex items-center justify-center shadow-sm mr-4">
-                <TicketIcon className="w-5 h-5 text-white" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-sm mr-4">
+                <TicketIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-dashboard-text">إدارة رموز الدعوة</h1>
-                <p className="text-dashboard-text-muted text-sm">
+                <h1 className="text-2xl font-bold">إدارة رموز الدعوة</h1>
+                <p className="text-white/80 mt-1">
                   إدارة وتتبع {isLoadingStats ? "..." : stats.total} رمز دعوة ({isLoadingStats ? "..." : stats.active} نشط, {isLoadingStats ? "..." : stats.used} مستخدم)
                 </p>
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative">
-                <Input
-                  placeholder="البحث عن رموز..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-dashboard-bg border-dashboard-border text-dashboard-text pr-10 w-full sm:w-64 text-right"
-                />
-                <SearchIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dashboard-text-muted" />
-              </div>
-              
-              <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-                <Button className="bg-dashboard-accent hover:bg-dashboard-accent-hover text-white shadow-sm" onClick={() => setAddDialogOpen(true)}>
-                  <PlusIcon className="h-4 w-4 ml-2" />
-                  رمز جديد
-                </Button>
-                <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl">إضافة رمز دعوة جديد</DialogTitle>
-                    <DialogDescription className="text-dashboard-text-muted">
-                      قم بإنشاء رمز دعوة جديد للمستخدمين
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="new-code">رمز الدعوة</Label>
-                      <Input
-                        id="new-code"
-                        placeholder="أدخل رمز الدعوة"
-                        value={newCode}
-                        onChange={(e) => setNewCode(e.target.value)}
-                        className="bg-dashboard-bg border-dashboard-border text-dashboard-text focus:ring-primary-500/50 text-right"
-                      />
-                    </div>
+            <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+              <Button className="bg-white hover:bg-white/90 text-primary-600 font-medium shadow-sm w-full md:w-auto" onClick={() => setAddDialogOpen(true)}>
+                <PlusIcon className="h-5 w-5 ml-2" />
+                إضافة رمز جديد
+              </Button>
+              <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text shadow-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold text-primary-700">إضافة رمز دعوة جديد</DialogTitle>
+                  <DialogDescription className="text-dashboard-text-muted">
+                    قم بإنشاء رمز دعوة جديد للمستخدمين
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-3">
+                    <Label htmlFor="new-code" className="text-dashboard-text font-medium">رمز الدعوة</Label>
+                    <Input
+                      id="new-code"
+                      placeholder="أدخل رمز الدعوة"
+                      value={newCode}
+                      onChange={(e) => setNewCode(e.target.value)}
+                      className="bg-white border-gray-200 focus:border-primary-300 focus:ring-primary-300 text-dashboard-text h-12 text-lg shadow-sm"
+                    />
+                    <p className="text-xs text-dashboard-text-muted">
+                      الرجاء إدخال رمز دعوة فريد غير مستخدم من قبل
+                    </p>
                   </div>
-                  <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2">
-                    <Button 
-                      onClick={handleAddCode}
-                      className="bg-primary-500 hover:bg-primary-600 text-white"
-                    >
-                      إضافة الرمز
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setAddDialogOpen(false)}
-                      className="bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                    >
-                      إلغاء
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+                </div>
+                <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button 
+                    onClick={handleAddCode}
+                    className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm h-11"
+                  >
+                    إضافة الرمز
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setAddDialogOpen(false)}
+                    className="bg-white border-gray-200 text-dashboard-text hover:bg-gray-50 h-11"
+                  >
+                    إلغاء
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>
       
+      {/* Search and Filter Bar */}
+      <Card className="border border-dashboard-border shadow-md p-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="relative flex-grow">
+            <SearchIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
+            <Input
+              placeholder="البحث عن رموز الدعوة..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white border-gray-200 focus:border-primary-300 focus:ring-primary-300 text-dashboard-text pr-12 h-12 text-lg w-full shadow-sm"
+            />
+          </div>
+          
+          <div className="flex items-center min-w-[200px]">
+            <Select
+              value={filterStatus}
+              onValueChange={(value) => setFilterStatus(value)}
+            >
+              <SelectTrigger className="w-full h-12 bg-white border-gray-200 text-dashboard-text shadow-sm">
+                <div className="flex items-center">
+                  <FilterIcon className="h-4 w-4 ml-2 text-primary-500" />
+                  <SelectValue placeholder="كل الرموز" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white border-dashboard-border text-dashboard-text">
+                <SelectItem value="all">كل الرموز</SelectItem>
+                <SelectItem value="active">الرموز النشطة</SelectItem>
+                <SelectItem value="inactive">الرموز الغير نشطة</SelectItem>
+                <SelectItem value="scanned">تم مسحها</SelectItem>
+                <SelectItem value="not_scanned">لم يتم المسح</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {!isLoading && (
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => fetchInviteCodes()}
+              className="h-12 w-12 text-primary-500 border-gray-200 hover:border-primary-300 hover:bg-primary-50 shadow-sm"
+            >
+              <RefreshCwIcon className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
+      </Card>
+      
       {/* Main Card */}
-      <Card className="bg-white shadow-sm border-dashboard-border">
+      <Card className="bg-white shadow-md border-dashboard-border">
         <CardHeader className="border-b border-dashboard-border bg-white px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="flex items-center text-lg font-semibold text-dashboard-text">
                 <TicketIcon className="h-5 w-5 ml-2 text-primary-500" />
-                رموز الدعوة
+                قائمة رموز الدعوة
               </CardTitle>
               <CardDescription className="text-dashboard-text-muted mt-1">
                 عرض وتعديل وحذف رموز الدعوة الخاصة بك
               </CardDescription>
-            </div>
-            
-            <div className="flex items-center gap-3 mt-3 sm:mt-0">
-              <div className="flex items-center">
-                <FilterIcon className="h-4 w-4 ml-2 text-dashboard-text-muted" />
-                <Select
-                  value={filterStatus}
-                  onValueChange={(value) => setFilterStatus(value)}
-                >
-                  <SelectTrigger className="w-[160px] bg-dashboard-bg border-dashboard-border text-dashboard-text">
-                    <SelectValue placeholder="كل الرموز" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-dashboard-border text-dashboard-text">
-                    <SelectItem value="all">كل الرموز</SelectItem>
-                    <SelectItem value="active">الرموز النشطة</SelectItem>
-                    <SelectItem value="inactive">الرموز الغير نشطة</SelectItem>
-                    <SelectItem value="scanned">تم مسحها</SelectItem>
-                    <SelectItem value="not_scanned">لم يتم مسحها</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {!isLoading && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => fetchInviteCodes()}
-                  className="text-dashboard-text-muted hover:text-dashboard-text hover:bg-dashboard-bg"
-                >
-                  <RefreshCwIcon className="h-4 w-4" />
-                </Button>
-              )}
             </div>
           </div>
         </CardHeader>
@@ -365,24 +357,24 @@ export default function InviteCodesPage() {
             <div className="overflow-x-auto">
               <Table className="w-full text-right">
                 <TableHeader>
-                  <TableRow className="bg-dashboard-bg border-b border-dashboard-border hover:bg-dashboard-bg/70">
-                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/4 text-center">الرمز</TableHead>
-                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">الحالة</TableHead>
-                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">حالة المسح</TableHead>
-                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/4 text-center">تاريخ الإنشاء</TableHead>
-                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">الإجراءات</TableHead>
+                  <TableRow className="bg-gray-50 border-b border-dashboard-border hover:bg-gray-50/80">
+                    <TableHead className="text-dashboard-text-muted font-medium py-4 px-6 w-1/4 text-center">الرمز</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-4 px-6 w-1/6 text-center">الحالة</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-4 px-6 w-1/6 text-center">حالة المسح</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-4 px-6 w-1/4 text-center">تاريخ الإنشاء</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-4 px-6 w-1/6 text-center">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {inviteCodes.map((code, index) => (
                     <TableRow 
                       key={code.id} 
-                      className={`border-b border-dashboard-border transition-colors hover:bg-dashboard-bg/50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
+                      className={`border-b border-dashboard-border transition-colors hover:bg-primary-50/20 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
                     >
-                      <TableCell className="font-medium text-dashboard-text py-3 px-4 text-center">
+                      <TableCell className="font-medium text-dashboard-text py-4 px-6 text-center">
                         {code.code}
                       </TableCell>
-                      <TableCell className="py-3 px-4 text-center">
+                      <TableCell className="py-4 px-6 text-center">
                         <div className="flex justify-center">
                           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
                             ${code.isActive 
@@ -394,11 +386,11 @@ export default function InviteCodesPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="py-3 px-4 text-center">
+                      <TableCell className="py-4 px-6 text-center">
                         <div className="flex justify-center">
                           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
                             ${!code.isActive 
-                              ? 'bg-blue-100 text-blue-700 border border-blue-200 shadow-sm' 
+                              ? 'bg-primary-100 text-primary-700 border border-primary-200 shadow-sm' 
                               : 'bg-gray-100 text-gray-700 border border-gray-200 shadow-sm'
                             }`}
                           >
@@ -406,15 +398,15 @@ export default function InviteCodesPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-dashboard-text-muted py-3 px-4 text-center">
+                      <TableCell className="text-dashboard-text-muted py-4 px-6 text-center">
                         {formatDate(code.createdAt)}
                       </TableCell>
-                      <TableCell className="py-3 px-4 text-center">
+                      <TableCell className="py-4 px-6 text-center">
                         <div className="flex justify-center gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-primary-500"
+                            className="h-9 w-9 p-0 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-full"
                             onClick={() => openEditDialog(code)}
                           >
                             <PencilIcon className="h-4 w-4" />
@@ -429,27 +421,28 @@ export default function InviteCodesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-red-500"
+                                className="h-9 w-9 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full"
                               >
                                 <TrashIcon className="h-4 w-4" />
                                 <span className="sr-only">حذف</span>
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text">
+                            <AlertDialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text shadow-lg">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>حذف رمز الدعوة</AlertDialogTitle>
+                                <AlertDialogTitle className="text-xl font-semibold text-red-600">حذف رمز الدعوة</AlertDialogTitle>
                                 <AlertDialogDescription className="text-dashboard-text-muted">
-                                  هل أنت متأكد من رغبتك في حذف رمز الدعوة "{code.code}"؟ هذا الإجراء لا يمكن التراجع عنه.
+                                  هل أنت متأكد من رغبتك في حذف رمز الدعوة "<span className="font-medium text-dashboard-text">{code.code}</span>"؟ 
+                                  <br />هذا الإجراء لا يمكن التراجع عنه.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
-                              <AlertDialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2">
+                              <AlertDialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2 pt-2">
                                 <AlertDialogAction
-                                  className="bg-red-500 hover:bg-red-600 text-white"
+                                  className="bg-red-500 hover:bg-red-600 text-white shadow-sm h-11"
                                   onClick={() => handleDeleteCode(code.id)}
                                 >
-                                  حذف
+                                  نعم، احذف الرمز
                                 </AlertDialogAction>
-                                <AlertDialogCancel className="bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg">
+                                <AlertDialogCancel className="bg-white border-gray-200 text-dashboard-text hover:bg-gray-50 h-11">
                                   إلغاء
                                 </AlertDialogCancel>
                               </AlertDialogFooter>
@@ -471,81 +464,94 @@ export default function InviteCodesPage() {
               {(searchTerm || filterStatus !== "all") && " بعد التصفية"}
             </div>
             
-            {/* عناصر الترقيم */}
-            {pagination.totalPages > 1 && (
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(1)}
-                  disabled={!pagination.hasPrevPage}
-                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                >
-                  <span className="sr-only">الصفحة الأولى</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(currentPage - 1)}
-                  disabled={!pagination.hasPrevPage}
-                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                >
-                  <span className="sr-only">الصفحة السابقة</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </Button>
-                
-                <div className="flex items-center justify-center gap-1">
-                  {/* عرض أزرار الصفحات */}
-                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    // حساب أرقام الصفحات المعروضة
-                    let pageNum;
-                    if (pagination.totalPages <= 5) {
-                      pageNum = i + 1; // عرض كل الصفحات إذا كان عددها 5 أو أقل
-                    } else {
-                      // منطق عرض الصفحات عندما يكون هناك أكثر من 5
-                      if (currentPage <= 3) {
-                        pageNum = i + 1; // عرض الصفحات 1-5
-                      } else if (currentPage >= pagination.totalPages - 2) {
-                        pageNum = pagination.totalPages - 4 + i; // عرض آخر 5 صفحات
-                      } else {
-                        pageNum = currentPage - 2 + i; // عرض الصفحة الحالية في المنتصف
-                      }
-                    }
-                    
-                    return (
-                      <PaginationButton
-                        key={pageNum}
-                        page={pageNum}
-                        isActive={pageNum === currentPage}
-                        onClick={() => setPage(pageNum)}
-                      />
-                    );
-                  })}
+            {/* Pagination */}
+            {!isLoading && !error && pagination.totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(1)}
+                    disabled={currentPage === 1}
+                    className="h-10 w-10 p-0 bg-white border-gray-200 text-dashboard-text hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 disabled:opacity-50"
+                  >
+                    <span className="sr-only">الصفحة الأولى</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mirror-rtl"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="h-10 w-10 p-0 bg-white border-gray-200 text-dashboard-text hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 disabled:opacity-50"
+                  >
+                    <span className="sr-only">الصفحة السابقة</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mirror-rtl"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  </Button>
+                  
+                  <div className="flex gap-1">
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        // Show first page, last page, current page, and pages around current page
+                        return (
+                          page === 1 || 
+                          page === pagination.totalPages || 
+                          Math.abs(page - currentPage) <= 1
+                        )
+                      })
+                      .map((page, index, array) => {
+                        // Add ellipsis if there are skipped pages
+                        const prevPage = array[index - 1];
+                        const showEllipsisBefore = prevPage && page - prevPage > 1;
+                        
+                        return (
+                          <Fragment key={page}>
+                            {showEllipsisBefore && (
+                              <div className="h-10 w-10 flex items-center justify-center text-dashboard-text-muted">
+                                ...
+                              </div>
+                            )}
+                            <Button
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setPage(page)}
+                              className={`h-10 w-10 p-0 ${
+                                currentPage === page 
+                                  ? 'bg-primary-600 hover:bg-primary-700 text-white font-medium' 
+                                  : 'bg-white border-gray-200 text-dashboard-text hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200'
+                              }`}
+                            >
+                              {page}
+                            </Button>
+                          </Fragment>
+                        )
+                      })
+                  }
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="h-10 w-10 p-0 bg-white border-gray-200 text-dashboard-text hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 disabled:opacity-50"
+                  >
+                    <span className="sr-only">الصفحة التالية</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mirror-rtl"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPage(pagination.totalPages)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="h-10 w-10 p-0 bg-white border-gray-200 text-dashboard-text hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 disabled:opacity-50"
+                  >
+                    <span className="sr-only">الصفحة الأخيرة</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mirror-rtl"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                  </Button>
                 </div>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                >
-                  <span className="sr-only">الصفحة التالية</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(pagination.totalPages)}
-                  disabled={!pagination.hasNextPage}
-                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
-                >
-                  <span className="sr-only">الصفحة الأخيرة</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
-                </Button>
               </div>
             )}
             
@@ -557,45 +563,56 @@ export default function InviteCodesPage() {
       </Card>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text">
+        <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text shadow-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl">تعديل رمز الدعوة</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-primary-700">تعديل رمز الدعوة</DialogTitle>
             <DialogDescription className="text-dashboard-text-muted">
-              تحديث تفاصيل رمز الدعوة
+              قم بتعديل معلومات رمز الدعوة
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-code">رمز الدعوة</Label>
+            <div className="space-y-3">
+              <Label htmlFor="edit-code" className="text-dashboard-text font-medium">رمز الدعوة</Label>
               <Input
                 id="edit-code"
                 placeholder="أدخل رمز الدعوة"
                 value={editCode.code}
                 onChange={(e) => setEditCode({ ...editCode, code: e.target.value })}
-                className="bg-dashboard-bg border-dashboard-border text-dashboard-text focus:ring-primary-500/50 text-right"
+                className="bg-white border-gray-200 focus:border-primary-300 focus:ring-primary-300 text-dashboard-text h-12 text-lg shadow-sm"
               />
             </div>
-            <div className="flex items-center gap-3">
-              <Label htmlFor="active-status">مفعّل</Label>
-              <Switch
-                id="active-status"
-                checked={editCode.isActive}
-                onCheckedChange={(checked: boolean) => setEditCode({ ...editCode, isActive: checked })}
-                className="data-[state=checked]:bg-primary-500"
-              />
+            
+            <div className="pt-2">
+              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <Label 
+                  htmlFor="is-active" 
+                  className="text-dashboard-text font-medium cursor-pointer select-none"
+                >
+                  رمز نشط
+                </Label>
+                <Switch
+                  id="is-active"
+                  checked={editCode.isActive}
+                  onCheckedChange={(checked) => setEditCode({ ...editCode, isActive: checked })}
+                  className="data-[state=checked]:bg-primary-500"
+                />
+              </div>
+              <p className="text-xs text-dashboard-text-muted mt-2">
+                الرموز غير النشطة لا يمكن استخدامها للمسح
+              </p>
             </div>
           </div>
-          <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2">
+          <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2 pt-2">
             <Button 
               onClick={handleEditCode}
-              className="bg-primary-500 hover:bg-primary-600 text-white"
+              className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm h-11"
             >
               حفظ التغييرات
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setEditDialogOpen(false)}
-              className="bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+              className="bg-white border-gray-200 text-dashboard-text hover:bg-gray-50 h-11"
             >
               إلغاء
             </Button>
