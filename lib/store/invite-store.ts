@@ -4,6 +4,7 @@ export type InviteCode = {
   id: string
   code: string
   isActive: boolean
+  isScanned: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -18,6 +19,7 @@ type InviteStore = {
   deleteInviteCode: (id: string) => Promise<void>
   verifyInviteCode: (code: string) => Promise<boolean>
   generateInviteCodes: (count: number, length: number) => Promise<void>
+  scanInviteCode: (code: string) => Promise<{success: boolean, message: string}>
 }
 
 export const useInviteStore = create<InviteStore>((set, get) => ({
@@ -106,6 +108,24 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       await get().fetchInviteCodes()
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
+    }
+  },
+
+  scanInviteCode: async (code: string) => {
+    set({ isLoading: true, error: null })
+    try {
+      const response = await fetch('/api/scan-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      })
+      if (!response.ok) throw new Error('فشل في التحقق من رمز الدعوة')
+      const data = await response.json()
+      set({ isLoading: false })
+      return data
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false })
+      return { success: false, message: 'فشل في التحقق من رمز الدعوة' }
     }
   }
 })) 

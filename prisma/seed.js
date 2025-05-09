@@ -10,31 +10,38 @@ async function main() {
   const demoInviteCodes = [
     {
       code: 'WELCOME2024',
-      isActive: true
+      isActive: true,
+      isScanned: false
     },
     {
       code: 'VIP-ACCESS',
-      isActive: true
+      isActive: true,
+      isScanned: true
     },
     {
       code: 'BETA-TESTER',
-      isActive: true
+      isActive: true,
+      isScanned: false
     },
     {
       code: 'EARLYBIRD',
-      isActive: false
+      isActive: false,
+      isScanned: false
     },
     {
       code: 'PREMIUM-USER',
-      isActive: true
+      isActive: true,
+      isScanned: true
     },
     {
       code: 'SPECIAL-OFFER',
-      isActive: false
+      isActive: false,
+      isScanned: false
     },
     {
       code: 'FRIENDS-ONLY',
-      isActive: true
+      isActive: true,
+      isScanned: false
     }
   ]
 

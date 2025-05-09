@@ -9,10 +9,15 @@ import { CheckCircle, Cancel, ArrowForward, AutoAwesome } from '@mui/icons-mater
 import Link from 'next/link'
 
 export default function HomePage() {
-  const { verifyInviteCode } = useInviteStore()
+  const { verifyInviteCode, scanInviteCode } = useInviteStore()
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<{ valid: boolean; checked: boolean }>({
+  const [result, setResult] = useState<{ 
+    valid: boolean; 
+    checked: boolean;
+    isScanned?: boolean;
+    scanMessage?: string;
+  }>({
     valid: false,
     checked: false
   })
@@ -27,6 +32,31 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error verifying code:', error)
       setResult({ valid: false, checked: true })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const handleScan = async () => {
+    if (!code.trim()) return
+    
+    setIsLoading(true)
+    try {
+      const scanResult = await scanInviteCode(code.trim())
+      setResult({ 
+        valid: scanResult.success, 
+        checked: true,
+        isScanned: true,
+        scanMessage: scanResult.message
+      })
+    } catch (error) {
+      console.error('Error scanning code:', error)
+      setResult({ 
+        valid: false, 
+        checked: true,
+        isScanned: true,
+        scanMessage: 'حدث خطأ أثناء مسح الرمز'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -70,14 +100,24 @@ export default function HomePage() {
                   className="w-full"
                   dir="rtl"
                 />
-                <Button 
-                  onClick={handleVerify} 
-                  disabled={isLoading || !code.trim()}
-                  className="w-full"
-                  variant="materio"
-                >
-                  {isLoading ? 'جاري التحقق...' : 'التحقق من الرمز'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleVerify} 
+                    disabled={isLoading || !code.trim()}
+                    className="flex-1"
+                    variant="materio"
+                  >
+                    {isLoading ? 'جاري التحقق...' : 'التحقق من الرمز'}
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleScan} 
+                    disabled={isLoading || !code.trim()}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {isLoading ? 'جاري المسح...' : 'مسح الرمز'}
+                  </Button>
+                </div>
               </div>
 
               {result.checked && (
@@ -90,12 +130,17 @@ export default function HomePage() {
                     ? <CheckCircle color="success" className="h-6 w-6 ml-3 flex-shrink-0" /> 
                     : <Cancel color="error" className="h-6 w-6 ml-3 flex-shrink-0" />
                   }
-                  <span className="text-lg">
-                    {result.valid 
-                      ? 'رمز دعوة صالح!' 
-                      : 'رمز دعوة غير صالح أو غير مفعّل.'
-                    }
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-lg font-medium">
+                      {result.isScanned 
+                        ? (result.valid ? 'تم مسح الرمز بنجاح!' : 'فشل في مسح الرمز')
+                        : (result.valid ? 'رمز دعوة صالح!' : 'رمز دعوة غير صالح أو غير مفعّل.')
+                      }
+                    </span>
+                    {result.isScanned && result.scanMessage && (
+                      <span className="text-sm mt-1">{result.scanMessage}</span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

@@ -299,6 +299,7 @@ export default function DashboardPage() {
                   <TableRow className="border-dashboard-border hover:bg-dashboard-bg">
                     <TableHead className="text-dashboard-text-muted">الرمز</TableHead>
                     <TableHead className="text-dashboard-text-muted">الحالة</TableHead>
+                    <TableHead className="text-dashboard-text-muted">حالة المسح</TableHead>
                     <TableHead className="text-dashboard-text-muted">تاريخ الإنشاء</TableHead>
                     <TableHead className="text-dashboard-text-muted text-left">الإجراءات</TableHead>
                   </TableRow>
@@ -314,6 +315,15 @@ export default function DashboardPage() {
                             : 'bg-red-100 text-red-700 border border-red-200'
                         }`}>
                           {code.isActive ? 'مفعّل' : 'غير مفعّل'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                          code.isScanned 
+                            ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                            : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        }`}>
+                          {code.isScanned ? 'تم المسح' : 'لم يتم المسح'}
                         </span>
                       </TableCell>
                       <TableCell className="text-dashboard-text-muted">
