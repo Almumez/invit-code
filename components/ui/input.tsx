@@ -1,53 +1,19 @@
 import * as React from 'react';
-import TextField from '@mui/material/TextField';
-import { styled } from '@mui/material/styles';
-import { TextFieldProps } from '@mui/material/TextField';
+import { cn } from '@/lib/utils';
 
-interface InputProps extends Omit<TextFieldProps, 'variant'> {
-  fullWidth?: boolean;
-  size?: 'small' | 'medium';
-}
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '0.5rem',
-    backgroundColor: '#fff',
-    transition: 'border-color 0.2s ease',
-    '& fieldset': {
-      borderColor: 'rgba(0, 0, 0, 0.23)',
-    },
-    '&:hover fieldset': {
-      borderColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#000',
-      borderWidth: '1px',
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: 'rgba(0, 0, 0, 0.6)',
-    '&.Mui-focused': {
-      color: '#000',
-    },
-  },
-  '& .MuiInputBase-input': {
-    padding: '0.75rem 1rem',
-    fontSize: '1rem',
-  },
-  '& .MuiInputBase-input.MuiInputBase-inputSizeSmall': {
-    padding: '0.5rem 0.75rem',
-    fontSize: '0.875rem',
-  },
-}));
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ fullWidth = true, size = 'medium', ...props }, ref) => {
+  ({ className, type, ...props }, ref) => {
     return (
-      <StyledTextField
-        variant="outlined"
-        inputRef={ref}
-        fullWidth={fullWidth}
-        size={size}
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-dashboard-border bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-dashboard-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        ref={ref}
         {...props}
       />
     );

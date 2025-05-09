@@ -5,6 +5,7 @@ import { default as MuiCardHeader } from '@mui/material/CardHeader';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import { cn } from "@/lib/utils"
 
 // Styled components
 const StyledCard = styled(MuiCard)(({ theme }) => ({
@@ -44,42 +45,73 @@ const StyledCardFooter = styled(CardActions)(({ theme }) => ({
 // Components
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof StyledCard>
->((props, ref) => <StyledCard ref={ref} {...props} />);
-Card.displayName = 'Card';
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "materio-card rounded-lg border border-dashboard-border bg-white text-dashboard-text shadow-soft",
+      className
+    )}
+    {...props}
+  />
+))
+Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof StyledCardHeader>
->((props, ref) => <StyledCardHeader ref={ref} {...props} />);
-CardHeader.displayName = 'CardHeader';
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
-  HTMLHeadingElement,
-  React.ComponentPropsWithoutRef<typeof Typography>
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <Typography variant="h5" component="h3" ref={ref} {...props} />
-));
-CardTitle.displayName = 'CardTitle';
+  <h3
+    ref={ref}
+    className={cn("text-lg font-semibold text-dashboard-text leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.ComponentPropsWithoutRef<typeof Typography>
+  React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <Typography variant="body2" color="text.secondary" ref={ref} {...props} />
-));
-CardDescription.displayName = 'CardDescription';
+  <p
+    ref={ref}
+    className={cn("text-sm text-dashboard-text-muted", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof StyledCardContent>
->((props, ref) => <StyledCardContent ref={ref} {...props} />);
-CardContent.displayName = 'CardContent';
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof StyledCardFooter>
->((props, ref) => <StyledCardFooter ref={ref} {...props} />);
-CardFooter.displayName = 'CardFooter';
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }

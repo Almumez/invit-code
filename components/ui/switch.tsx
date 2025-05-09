@@ -1,30 +1,39 @@
 'use client';
 
 import * as React from 'react';
-import MuiSwitch from '@mui/material/Switch';
+import MuiSwitch, { SwitchProps as MuiSwitchProps } from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
 
 import { cn } from '@/lib/utils';
 
-const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
-  width: 44,
-  height: 24,
+interface SwitchProps extends Omit<MuiSwitchProps, 'onChange'> {
+  onCheckedChange?: (checked: boolean) => void;
+  checked?: boolean;
+}
+
+const MaterialSwitch = styled(MuiSwitch)(({ theme }) => ({
+  width: 42,
+  height: 26,
   padding: 0,
   '& .MuiSwitch-switchBase': {
     padding: 0,
     margin: 2,
     transitionDuration: '300ms',
     '&.Mui-checked': {
-      transform: 'translateX(20px)',
+      transform: 'translateX(16px)',
       color: '#fff',
       '& + .MuiSwitch-track': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : theme.palette.primary.main,
+        backgroundColor: 'var(--primary-500)',
         opacity: 1,
         border: 0,
       },
       '&.Mui-disabled + .MuiSwitch-track': {
         opacity: 0.5,
       },
+    },
+    '&.Mui-focusVisible .MuiSwitch-thumb': {
+      color: 'var(--primary-500)',
+      border: '6px solid #fff',
     },
     '&.Mui-disabled .MuiSwitch-thumb': {
       color: theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[600],
@@ -35,12 +44,12 @@ const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
   },
   '& .MuiSwitch-thumb': {
     boxSizing: 'border-box',
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 22,
   },
   '& .MuiSwitch-track': {
-    borderRadius: 12,
-    backgroundColor: theme.palette.mode === 'light' ? '#E9E9EA' : '#39393D',
+    borderRadius: 13,
+    backgroundColor: 'var(--dashboard-border)',
     opacity: 1,
     transition: theme.transitions.create(['background-color'], {
       duration: 500,
@@ -48,23 +57,17 @@ const StyledSwitch = styled(MuiSwitch)(({ theme }) => ({
   },
 }));
 
-interface SwitchProps extends React.ComponentProps<typeof MuiSwitch> {
-  className?: string;
-}
-
-const Switch = React.forwardRef<
-  HTMLButtonElement,
-  SwitchProps
->(({ className, ...props }, ref) => (
-  <StyledSwitch
-    className={cn(
-      'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent',
-      className
-    )}
-    {...props}
-    ref={ref}
-  />
-));
+const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
+  ({ className, checked, onCheckedChange, ...props }, ref) => (
+    <MaterialSwitch
+      ref={ref}
+      checked={checked}
+      onChange={(e, checked) => onCheckedChange?.(checked)}
+      className={cn(className)}
+      {...props}
+    />
+  )
+);
 
 Switch.displayName = 'Switch';
 

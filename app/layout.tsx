@@ -22,8 +22,8 @@ export default function RootLayout({
   children: ReactNode
 }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body className={tajawal.className}>
+    <html lang="ar" dir="rtl" className="light">
+      <body className={`${tajawal.className} antialiased bg-dashboard-bg`}>
         <ThemeRegistry>
           {children}
         </ThemeRegistry>

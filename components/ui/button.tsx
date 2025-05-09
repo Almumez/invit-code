@@ -1,72 +1,54 @@
-import * as React from 'react';
-import { default as MuiButton } from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-import { ButtonProps as MuiButtonProps } from '@mui/material/Button';
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-interface ButtonProps extends MuiButtonProps {
-  variant?: 'contained' | 'outlined' | 'text';
-  size?: 'small' | 'medium' | 'large';
-  fullWidth?: boolean;
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary-500 text-white hover:bg-primary-600 shadow-sm",
+        destructive: "bg-red-500 text-destructive-foreground hover:bg-red-600 shadow-sm",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary-500 underline-offset-4 hover:underline",
+        materio: "bg-dashboard-accent text-white hover:bg-dashboard-accent-hover shadow-soft",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
-const StyledButton = styled(MuiButton)(({ theme }) => ({
-  borderRadius: '0.5rem',
-  textTransform: 'none',
-  fontWeight: 500,
-  '&.MuiButton-contained': {
-    backgroundColor: '#000',
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: '#333',
-    },
-  },
-  '&.MuiButton-outlined': {
-    borderColor: '#000',
-    color: '#000',
-    '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.04)',
-    },
-  },
-  '&.MuiButton-text': {
-    color: '#000',
-    '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.04)',
-    },
-  },
-  '&.Mui-disabled': {
-    opacity: 0.5,
-  },
-  '&.MuiButton-sizeSmall': {
-    padding: '0.5rem 1rem',
-    fontSize: '0.875rem',
-  },
-  '&.MuiButton-sizeMedium': {
-    padding: '0.625rem 1.25rem',
-    fontSize: '1rem',
-  },
-  '&.MuiButton-sizeLarge': {
-    padding: '0.75rem 1.5rem',
-    fontSize: '1.125rem',
-  },
-}));
-
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'contained', size = 'medium', fullWidth = false, children, className, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
     return (
-      <StyledButton
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        variant={variant}
-        size={size}
-        fullWidth={fullWidth}
-        className={className}
         {...props}
-      >
-        {children}
-      </StyledButton>
-    );
+      />
+    )
   }
-);
+)
+Button.displayName = "Button"
 
-Button.displayName = 'Button';
-
-export { Button };
+export { Button, buttonVariants }

@@ -40,6 +40,16 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          50: '#f5f7ff',
+          100: '#ebf0ff',
+          200: '#d9e2ff',
+          300: '#b9c9ff',
+          400: '#8da3ff',
+          500: '#6378ff',
+          600: '#3b4df7',
+          700: '#2c3ae3',
+          800: '#2832bc',
+          900: '#252e94',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -66,7 +76,23 @@ const config: Config = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
+          purple: '#8367F7',
+          blue: '#5979F3',
+          green: '#56C982',
+          yellow: '#F7C367',
+          red: '#F35985',
         },
+        dashboard: {
+          bg: '#F5F7FB',
+          card: '#FFFFFF',
+          sidebar: '#F8F9FD',
+          accent: '#6378FF',
+          'accent-hover': '#3B4DF7',
+          text: '#1E293B',
+          'text-muted': '#64748B',
+          border: '#E2E8F0',
+          'widget-bg': '#F8F9FD',
+        }
       },
       keyframes: {
         'accordion-down': {

@@ -34,6 +34,77 @@ html[dir="rtl"] {
   }
 }
 
+/* أنماط Materio Dashboard */
+@layer components {
+  .dashboard-card {
+    @apply bg-white rounded-lg shadow-sm border border-dashboard-border transition-all hover:shadow-md;
+  }
+  
+  .dashboard-card-header {
+    @apply flex justify-between items-center p-6 border-b border-dashboard-border;
+  }
+  
+  .dashboard-card-title {
+    @apply text-lg font-semibold text-dashboard-text;
+  }
+  
+  .dashboard-card-content {
+    @apply p-6;
+  }
+  
+  .dashboard-button-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition-colors;
+  }
+  
+  .dashboard-button-outline {
+    @apply border border-dashboard-border bg-white hover:bg-dashboard-bg text-dashboard-text px-4 py-2 rounded-md transition-colors;
+  }
+  
+  .dashboard-icon-button {
+    @apply p-2 text-dashboard-text-muted hover:text-dashboard-text hover:bg-dashboard-bg rounded-full transition-colors;
+  }
+  
+  .dashboard-badge {
+    @apply px-2 py-1 text-xs rounded-full font-medium;
+  }
+  
+  .dashboard-badge-success {
+    @apply bg-green-100 text-green-700;
+  }
+  
+  .dashboard-badge-warning {
+    @apply bg-yellow-100 text-yellow-700;
+  }
+  
+  .dashboard-badge-danger {
+    @apply bg-red-100 text-red-700;
+  }
+  
+  .dashboard-badge-info {
+    @apply bg-blue-100 text-blue-700;
+  }
+  
+  .dashboard-stat-card {
+    @apply p-6 bg-white rounded-lg shadow-sm border border-dashboard-border;
+  }
+  
+  .dashboard-stat-icon {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center;
+  }
+  
+  .dashboard-data-row {
+    @apply flex items-center p-3 border-b border-dashboard-border;
+  }
+  
+  .dashboard-data-title {
+    @apply text-sm font-medium text-dashboard-text;
+  }
+  
+  .dashboard-data-subtitle {
+    @apply text-xs text-dashboard-text-muted;
+  }
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
@@ -113,13 +184,6 @@ html[dir="rtl"] {
   }
 }
 
-/* المتغيرات اللونية للتدرجات */
-:root {
-  --gradient-primary: from-black via-gray-600 to-black;
-  --gradient-primary-hover: from-gray-900 via-gray-700 to-gray-900;
-  --gradient-glass: bg-white/10 backdrop-blur-md border-white/20;
-}
-
 /* تأثيرات التدرج اللوني المتحرك */
 @keyframes gradient-shift {
   0% {
@@ -166,17 +230,6 @@ html[dir="rtl"] {
               0 0 70px rgba(50, 50, 50, 0.1);
 }
 
-/* تأثيرات زجاجية محسنة */
-.glass-effect {
-  @apply bg-white/10 backdrop-blur-md border border-white/20;
-  backdrop-filter: blur(10px);
-}
-
-.glass-effect-dark {
-  @apply bg-black/20 backdrop-blur-md border border-white/10;
-  backdrop-filter: blur(12px);
-}
-
 /* تأثيرات حركية للأزرار */
 .button-hover-effect {
   transition: all 0.3s ease;
@@ -190,24 +243,6 @@ html[dir="rtl"] {
   transform: translateY(1px);
 }
 
-/* تأثير تموج الخلفية */
-.wavy-background {
-  position: relative;
-  overflow: hidden;
-}
-
-.wavy-background::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-  opacity: 0.6;
-  z-index: -1;
-}
-
 /* فئات تأخير الرسوم المتحركة */
 .animation-delay-2000 {
   animation-delay: 2s;
@@ -217,67 +252,47 @@ html[dir="rtl"] {
   animation-delay: 4s;
 }
 
-/* Custom gradient animations */
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+/* تأثيرات وظلال Materio */
+.materio-shadow-sm {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.animated-gradient {
-  background-size: 300% 300%;
-  animation: gradient-shift 15s ease infinite;
+.materio-shadow-md {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Improved glassmorphism effect */
-.glass {
-  @apply bg-white/10 backdrop-blur-md border border-white/20;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.materio-shadow-lg {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* Card hover effects */
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.materio-card {
+  @apply bg-white rounded-lg border border-dashboard-border shadow-sm transition-all;
 }
 
-.card-hover:hover {
-  transform: translateY(-5px);
+.materio-card:hover {
+  @apply shadow-md;
 }
 
-/* Button glow effect */
-.btn-glow {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
+.materio-gradient-primary {
+  background: linear-gradient(to right, #6378FF, #4A61FC);
 }
 
-.btn-glow::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #000, #333, #000, #333);
-  background-size: 400% 400%;
-  z-index: -1;
-  animation: gradient-shift 3s ease infinite;
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.materio-gradient-dark {
+  background: linear-gradient(to right, #2f3b4c, #1e293b);
 }
 
-.btn-glow:hover::after {
-  opacity: 1;
+.materio-gradient-success {
+  background: linear-gradient(to right, #56C982, #3AAE62);
 }
 
-/* Gradient backgrounds */
+.materio-gradient-warning {
+  background: linear-gradient(to right, #F7C367, #F0AD4E);
+}
+
+.materio-gradient-danger {
+  background: linear-gradient(to right, #F35985, #E63757);
+}
+
 .gradient-primary {
   @apply bg-gradient-to-r from-black via-gray-800 to-black;
   @apply bg-[length:200%_200%] animate-gradient;

@@ -1,7 +1,13 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { LayoutGrid, Code2, HomeIcon, Settings } from 'lucide-react'
+import { 
+  Home, 
+  LogOut,
+  Search,
+  Bell, 
+  Clock
+} from 'lucide-react'
 
 export default function DashboardLayout({
   children
@@ -9,75 +15,74 @@ export default function DashboardLayout({
   children: ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 animated-gradient overflow-hidden">
-      {/* تأثيرات زخرفية في الخلفية */}
-      <div className="absolute inset-0 overflow-hidden z-0 opacity-50">
-        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[120px] opacity-30 animate-blob"></div>
-        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-[120px] opacity-30 animate-blob animation-delay-4000"></div>
-      </div>
-      
-      <div className="flex min-h-screen relative z-10">
+    <div className="min-h-screen bg-dashboard-bg text-dashboard-text">
+      <div className="flex min-h-screen">
         {/* Sidebar */}
-        <div className="hidden w-72 glass-effect border-l border-white/20 md:flex flex-col">
-          <div className="p-6 border-b border-white/10">
-            <h1 className="text-2xl font-bold text-white flex items-center">
-              <LayoutGrid className="h-6 w-6 ml-2 text-purple-300" />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">
-                لوحة التحكم
-              </span>
-            </h1>
+        <div className="hidden md:flex h-screen sticky top-0 flex-col w-64 bg-dashboard-sidebar border-r border-dashboard-border shadow-soft">
+          <div className="p-5 flex items-center gap-2">
+            <div className="materio-gradient-primary w-9 h-9 rounded-md flex items-center justify-center shadow-sm">
+              <span className="text-white font-bold text-lg">M</span>
+            </div>
+            <span className="font-bold text-xl text-dashboard-accent">MATERIO</span>
+            <div className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm">FREE</div>
           </div>
-          <div className="flex-1 py-8">
-            <nav className="px-4 space-y-2">
+          
+          <div className="p-3 mt-2">
+            <div className="bg-white mx-2 p-2 rounded-lg flex items-center shadow-sm border border-dashboard-border">
+              <Search className="h-4 w-4 text-dashboard-text-muted mr-2" />
+              <input 
+                type="text" 
+                placeholder="بحث..." 
+                className="bg-transparent w-full text-sm outline-none border-none text-dashboard-text placeholder:text-dashboard-text-muted"
+              />
+            </div>
+          </div>
+          
+          <div className="flex-1 py-4 px-3">
+            <div className="flex flex-col space-y-1">
               <Link
                 href="/dashboard"
-                className="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-all group"
+                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
               >
-                <Code2 className="h-5 w-5 ml-3 text-purple-300 group-hover:scale-110 transition-transform" />
-                <span>رموز الدعوة</span>
+                <Home className="h-5 w-5 ml-3 text-dashboard-accent" />
+                <span>لوحة التحكم</span>
               </Link>
+              
               <Link
                 href="/"
-                className="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-all group"
+                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
               >
-                <HomeIcon className="h-5 w-5 ml-3 text-purple-300 group-hover:scale-110 transition-transform" />
-                <span>الصفحة الرئيسية</span>
+                <LogOut className="h-5 w-5 ml-3 text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors" />
+                <span>تسجيل الخروج</span>
               </Link>
-              <div className="flex items-center px-4 py-3 text-white/50 rounded-lg">
-                <Settings className="h-5 w-5 ml-3 text-purple-300/50" />
-                <span>الإعدادات</span>
-              </div>
-            </nav>
-          </div>
-          <div className="p-4 mt-auto border-t border-white/10">
-            <div className="text-xs text-white/50 text-center">
-              نظام رموز الدعوة v1.0
             </div>
           </div>
         </div>
 
         {/* Main content */}
         <div className="flex-1 flex flex-col">
-          {/* Mobile header */}
-          <header className="md:hidden glass-effect p-4 border-b border-white/20 sticky top-0 z-50">
-            <div className="flex items-center justify-between">
-              <h1 className="text-lg font-medium text-white flex items-center">
-                <LayoutGrid className="h-5 w-5 ml-2 text-purple-300" />
-                <span>لوحة التحكم</span>
-              </h1>
-              <nav className="flex space-x-6">
-                <Link href="/" className="text-white hover:text-purple-300 transition-colors">
-                  <HomeIcon className="h-5 w-5" />
-                </Link>
-                <Link href="/dashboard" className="text-white hover:text-purple-300 transition-colors">
-                  <Code2 className="h-5 w-5" />
-                </Link>
-              </nav>
+          {/* Topbar */}
+          <header className="h-16 bg-white border-b border-dashboard-border flex items-center justify-between px-6 shadow-sm">
+            <div>
+              {/* Mobile Menu Button (if needed) */}
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <button className="text-dashboard-text-muted hover:text-dashboard-accent p-2 rounded-full hover:bg-dashboard-bg transition-colors">
+                <Clock className="w-5 h-5" />
+              </button>
+              <button className="text-dashboard-text-muted hover:text-dashboard-accent p-2 rounded-full hover:bg-dashboard-bg transition-colors relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-0 right-0 bg-red-500 w-2 h-2 rounded-full"></span>
+              </button>
+              <div className="h-10 w-10 bg-primary-100 rounded-full overflow-hidden flex items-center justify-center shadow-sm border border-primary-200">
+                <span className="text-primary-600 font-semibold text-sm">JD</span>
+              </div>
             </div>
           </header>
 
           {/* Content */}
-          <main className="flex-1 p-6 overflow-auto">
+          <main className="flex-1 p-6">
             <div className="max-w-7xl mx-auto">
               {children}
             </div>
