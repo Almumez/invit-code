@@ -1,13 +1,71 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// GET /api/invite-codes - Fetch all invite codes
-export async function GET() {
+// GET /api/invite-codes - Fetch invite codes with pagination and filtering
+export async function GET(request: Request) {
   try {
-    const inviteCodes = await prisma.inviteCode.findMany({
-      orderBy: { createdAt: 'desc' }
+    const { searchParams } = new URL(request.url)
+    
+    // Pagination parameters
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '20')
+    const skip = (page - 1) * limit
+    
+    // Filter parameters
+    const search = searchParams.get('search') || ''
+    const status = searchParams.get('status') || 'all'
+    
+    // Build where conditions
+    const whereConditions: any = {}
+    
+    // Add search condition if provided
+    if (search) {
+      whereConditions.code = {
+        contains: search,
+        mode: 'insensitive'
+      }
+    }
+    
+    // Add status filter
+    if (status === 'active') {
+      whereConditions.isActive = true
+    } else if (status === 'inactive') {
+      whereConditions.isActive = false
+    } else if (status === 'scanned') {
+      whereConditions.isActive = false // Assuming scanned codes are inactive
+    } else if (status === 'not_scanned') {
+      whereConditions.isActive = true // Assuming non-scanned codes are active
+    }
+    
+    // Get total count for pagination
+    const totalCount = await prisma.inviteCode.count({
+      where: whereConditions
     })
-    return NextResponse.json(inviteCodes)
+    
+    // Get invite codes with pagination and filtering
+    const inviteCodes = await prisma.inviteCode.findMany({
+      where: whereConditions,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit
+    })
+    
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit)
+    const hasNextPage = page < totalPages
+    const hasPrevPage = page > 1
+    
+    return NextResponse.json({
+      data: inviteCodes,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('خطأ في جلب رموز الدعوة:', error)
     return NextResponse.json(

@@ -66,9 +66,16 @@ import {
 export default function InviteCodesPage() {
   const { 
     inviteCodes, 
+    pagination,
     isLoading,
     error,
+    currentPage,
+    searchTerm,
+    filterStatus,
     fetchInviteCodes, 
+    setPage,
+    setSearchTerm,
+    setFilterStatus,
     addInviteCode, 
     updateInviteCode, 
     deleteInviteCode
@@ -78,8 +85,6 @@ export default function InviteCodesPage() {
   const [editCode, setEditCode] = useState({ id: '', code: '', isActive: true })
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>("all")
   
   // حالة لمربع الحوار التأكيدي
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<{open: boolean, codeId: string | null}>({
@@ -123,35 +128,24 @@ export default function InviteCodesPage() {
     setEditDialogOpen(true)
   }
 
-  // فلترة وتصفية رموز الدعوة
-  const filteredCodes = inviteCodes.filter(code => {
-    // فلترة حسب البحث
-    const matchesSearch = code.code.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    // فلترة حسب الحالة
-    if (filterStatus === "active") {
-      return matchesSearch && code.isActive
-    } else if (filterStatus === "inactive") {
-      return matchesSearch && !code.isActive
-    } else if (filterStatus === "scanned") {
-      return matchesSearch && !code.isActive // الرموز الممسوحة هي الغير مفعلة
-    } else if (filterStatus === "not_scanned") {
-      return matchesSearch && code.isActive // الرموز الغير ممسوحة هي المفعلة
-    }
-    
-    // في حالة الكل، نعرض فقط ما يطابق البحث
-    return matchesSearch
-  })
-
   // تنسيق التاريخ بالعربية
   const formatDate = (date: Date) => {
     return format(new Date(date), 'dd MMM yyyy', { locale: arSA })
   }
 
-  // إحصائيات للرموز
-  const totalCodes = inviteCodes.length
-  const activeCodes = inviteCodes.filter(code => code.isActive).length
-  const scannedCodes = inviteCodes.filter(code => !code.isActive).length
+  // المكون الخاص بزر الصفحة
+  const PaginationButton = ({ page, isActive, onClick }: { page: number, isActive: boolean, onClick: () => void }) => (
+    <Button
+      variant={isActive ? "default" : "outline"}
+      size="sm"
+      onClick={onClick}
+      className={`h-8 w-8 p-0 ${isActive 
+        ? 'bg-primary-500 hover:bg-primary-600 text-white' 
+        : 'bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg'}`}
+    >
+      {page}
+    </Button>
+  )
   
   return (
     <div className="space-y-6">
@@ -166,7 +160,7 @@ export default function InviteCodesPage() {
               <div>
                 <h1 className="text-xl font-bold text-dashboard-text">إدارة رموز الدعوة</h1>
                 <p className="text-dashboard-text-muted text-sm">
-                  إدارة وتتبع {totalCodes} رمز دعوة ({activeCodes} نشط, {scannedCodes} مستخدم)
+                  إدارة وتتبع {pagination.totalCount} رمز دعوة ({inviteCodes.filter(code => code.isActive).length} نشط, {inviteCodes.filter(code => !code.isActive).length} مستخدم)
                 </p>
               </div>
             </div>
@@ -247,24 +241,18 @@ export default function InviteCodesPage() {
                 <FilterIcon className="h-4 w-4 ml-2 text-dashboard-text-muted" />
                 <Select
                   value={filterStatus}
-                  onChange={(value) => setFilterStatus(value)}
-                  placeholder="تصفية حسب الحالة"
-                  className="w-[160px]"
-                  size="small"
-                  sx={{ 
-                    '& .MuiSelect-select': { 
-                      fontSize: '0.875rem',
-                      paddingY: '0.5rem',
-                      backgroundColor: 'var(--dashboard-bg)',
-                      borderColor: 'var(--dashboard-border)'
-                    }
-                  }}
+                  onValueChange={(value) => setFilterStatus(value)}
                 >
-                  <SelectItem value="all">كل الرموز</SelectItem>
-                  <SelectItem value="active">الرموز النشطة</SelectItem>
-                  <SelectItem value="inactive">الرموز الغير نشطة</SelectItem>
-                  <SelectItem value="scanned">تم مسحها</SelectItem>
-                  <SelectItem value="not_scanned">لم يتم مسحها</SelectItem>
+                  <SelectTrigger className="w-[160px] bg-dashboard-bg border-dashboard-border text-dashboard-text">
+                    <SelectValue placeholder="كل الرموز" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-dashboard-border text-dashboard-text">
+                    <SelectItem value="all">كل الرموز</SelectItem>
+                    <SelectItem value="active">الرموز النشطة</SelectItem>
+                    <SelectItem value="inactive">الرموز الغير نشطة</SelectItem>
+                    <SelectItem value="scanned">تم مسحها</SelectItem>
+                    <SelectItem value="not_scanned">لم يتم مسحها</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
               
@@ -302,7 +290,7 @@ export default function InviteCodesPage() {
                 إعادة المحاولة
               </Button>
             </div>
-          ) : filteredCodes.length === 0 ? (
+          ) : inviteCodes.length === 0 ? (
             <div className="py-16 text-center text-dashboard-text-muted flex flex-col items-center justify-center">
               {searchTerm || filterStatus !== "all" ? (
                 <>
@@ -339,7 +327,7 @@ export default function InviteCodesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCodes.map((code) => (
+                  {inviteCodes.map((code) => (
                     <TableRow key={code.id} className="border-dashboard-border hover:bg-dashboard-bg">
                       <TableCell className="font-medium text-dashboard-text">{code.code}</TableCell>
                       <TableCell>
@@ -418,13 +406,94 @@ export default function InviteCodesPage() {
             </div>
           )}
         </CardContent>
-        {!isLoading && !error && filteredCodes.length > 0 && (
-          <CardFooter className="border-t border-dashboard-border bg-white py-3 px-6 flex justify-between text-xs text-dashboard-text-muted">
-            <div>
-              عرض {filteredCodes.length} {filteredCodes.length === 1 ? 'رمز' : 'رموز'}
+        {!isLoading && !error && inviteCodes.length > 0 && (
+          <CardFooter className="border-t border-dashboard-border bg-white py-3 px-6 flex flex-col sm:flex-row justify-between gap-3 items-center">
+            <div className="text-xs text-dashboard-text-muted">
+              عرض {inviteCodes.length} من إجمالي {pagination.totalCount} رمز
               {(searchTerm || filterStatus !== "all") && " بعد التصفية"}
             </div>
-            <div>آخر تحديث: {format(new Date(), 'HH:mm yyyy/MM/dd', { locale: arSA })}</div>
+            
+            {/* عناصر الترقيم */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(1)}
+                  disabled={!pagination.hasPrevPage}
+                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+                >
+                  <span className="sr-only">الصفحة الأولى</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(currentPage - 1)}
+                  disabled={!pagination.hasPrevPage}
+                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+                >
+                  <span className="sr-only">الصفحة السابقة</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </Button>
+                
+                <div className="flex items-center justify-center gap-1">
+                  {/* عرض أزرار الصفحات */}
+                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    // حساب أرقام الصفحات المعروضة
+                    let pageNum;
+                    if (pagination.totalPages <= 5) {
+                      pageNum = i + 1; // عرض كل الصفحات إذا كان عددها 5 أو أقل
+                    } else {
+                      // منطق عرض الصفحات عندما يكون هناك أكثر من 5
+                      if (currentPage <= 3) {
+                        pageNum = i + 1; // عرض الصفحات 1-5
+                      } else if (currentPage >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i; // عرض آخر 5 صفحات
+                      } else {
+                        pageNum = currentPage - 2 + i; // عرض الصفحة الحالية في المنتصف
+                      }
+                    }
+                    
+                    return (
+                      <PaginationButton
+                        key={pageNum}
+                        page={pageNum}
+                        isActive={pageNum === currentPage}
+                        onClick={() => setPage(pageNum)}
+                      />
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+                >
+                  <span className="sr-only">الصفحة التالية</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(pagination.totalPages)}
+                  disabled={!pagination.hasNextPage}
+                  className="h-8 w-8 p-0 bg-white border-dashboard-border text-dashboard-text hover:bg-dashboard-bg"
+                >
+                  <span className="sr-only">الصفحة الأخيرة</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                </Button>
+              </div>
+            )}
+            
+            <div className="text-xs text-dashboard-text-muted">
+              صفحة {currentPage} من {pagination.totalPages}
+            </div>
           </CardFooter>
         )}
       </Card>

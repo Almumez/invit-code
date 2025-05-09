@@ -9,11 +9,32 @@ export type InviteCode = {
   updatedAt: Date
 }
 
+export type PaginationData = {
+  page: number
+  limit: number
+  totalCount: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
 type InviteStore = {
   inviteCodes: InviteCode[]
+  pagination: PaginationData
   isLoading: boolean
   error: string | null
-  fetchInviteCodes: () => Promise<void>
+  
+  // Pagination and filtering state
+  currentPage: number
+  searchTerm: string
+  filterStatus: string
+  
+  // Methods
+  fetchInviteCodes: (options?: { page?: number, search?: string, status?: string }) => Promise<void>
+  setPage: (page: number) => void
+  setSearchTerm: (term: string) => void
+  setFilterStatus: (status: string) => void
+  
   addInviteCode: (code: string) => Promise<void>
   updateInviteCode: (id: string, data: Partial<InviteCode>) => Promise<void>
   deleteInviteCode: (id: string) => Promise<void>
@@ -24,16 +45,74 @@ type InviteStore = {
 
 export const useInviteStore = create<InviteStore>((set, get) => ({
   inviteCodes: [],
+  pagination: {
+    page: 1,
+    limit: 20,
+    totalCount: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  },
   isLoading: false,
   error: null,
+  
+  // Pagination and filtering state
+  currentPage: 1,
+  searchTerm: '',
+  filterStatus: 'all',
 
-  fetchInviteCodes: async () => {
+  // Set pagination page
+  setPage: (page: number) => {
+    set({ currentPage: page })
+    get().fetchInviteCodes({ page })
+  },
+  
+  // Set search term
+  setSearchTerm: (term: string) => {
+    set({ searchTerm: term, currentPage: 1 })
+    get().fetchInviteCodes({ page: 1, search: term })
+  },
+  
+  // Set filter status
+  setFilterStatus: (status: string) => {
+    set({ filterStatus: status, currentPage: 1 })
+    get().fetchInviteCodes({ page: 1, status })
+  },
+
+  fetchInviteCodes: async (options = {}) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await fetch('/api/invite-codes')
+      const { currentPage, searchTerm, filterStatus } = get()
+      
+      // Use provided options or fall back to current state
+      const page = options.page || currentPage
+      const search = options.search !== undefined ? options.search : searchTerm
+      const status = options.status || filterStatus
+      
+      // Build query params
+      const params = new URLSearchParams()
+      params.append('page', page.toString())
+      params.append('limit', '20')
+      
+      if (search) {
+        params.append('search', search)
+      }
+      
+      if (status !== 'all') {
+        params.append('status', status)
+      }
+      
+      const response = await fetch(`/api/invite-codes?${params.toString()}`)
       if (!response.ok) throw new Error('فشل في جلب رموز الدعوة')
-      const data = await response.json()
-      set({ inviteCodes: data, isLoading: false })
+      
+      const { data, pagination } = await response.json()
+      
+      set({ 
+        inviteCodes: data, 
+        pagination,
+        currentPage: pagination.page,
+        isLoading: false 
+      })
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
