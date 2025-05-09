@@ -55,9 +55,9 @@ const AlertDialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogContent>
 >(({ className, children, ...props }, ref) => (
   <DialogContent
-    ref={ref}
+      ref={ref}
     className={cn(className)}
-    {...props}
+      {...props}
   >
     {children}
   </DialogContent>

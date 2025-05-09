@@ -15,10 +15,16 @@ export const useAuthStore = create<AuthStore>()(
       login: (username: string, password: string) => {
         // تحقق من بيانات تسجيل الدخول المحددة مسبقًا
         if (username === 'admin' && password === '123456') {
+          // تعيين الحالة بشكل متزامن
           set({ isLoggedIn: true })
-          // حفظ حالة تسجيل الدخول في localStorage بشكل مباشر أيضًا للتأكيد
+          
+          // حفظ حالة تسجيل الدخول في localStorage بشكل مباشر للتأكيد
           if (typeof window !== 'undefined') {
             localStorage.setItem('user-logged-in', 'true')
+            // حفظ مباشر لبيانات Zustand في localStorage أيضًا للتأكد من تزامنها
+            localStorage.setItem('auth-storage', JSON.stringify({
+              state: { isLoggedIn: true }
+            }))
           }
           return true
         }
@@ -27,9 +33,15 @@ export const useAuthStore = create<AuthStore>()(
       
       logout: () => {
         set({ isLoggedIn: false })
-        // إزالة العنصر من localStorage
+        
+        // إزالة البيانات من localStorage
         if (typeof window !== 'undefined') {
           localStorage.removeItem('user-logged-in')
+          localStorage.removeItem('auth-storage')
+          
+          // إزالة ملف تعريف الارتباط أيضًا
+          document.cookie = "user-logged-in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie = "auth-storage=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         }
       }
     }),

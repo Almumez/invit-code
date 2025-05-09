@@ -25,7 +25,16 @@ export default function DashboardLayout({
   
   const handleLogout = () => {
     logout()
-    router.push('/login')
+    
+    // استخدام router.replace بدلاً من router.push لضمان الانتقال بشكل صحيح
+    router.replace('/login')
+    
+    // خطة بديلة إذا فشل router.replace
+    setTimeout(() => {
+      if (!window.location.pathname.includes('/login')) {
+        window.location.replace('/login')
+      }
+    }, 300)
   }
 
   return (

@@ -26,13 +26,14 @@ export default function LoginPage() {
   // إذا كان المستخدم مسجل الدخول، فقم بتوجيهه إلى لوحة التحكم
   useEffect(() => {
     // التحقق من تسجيل الدخول من المتجر والتخزين المحلي
-    const checkAuth = () => {
+    const checkAuth = async () => {
       if (isLoggedIn || (typeof window !== 'undefined' && localStorage.getItem('user-logged-in') === 'true')) {
-        // محاولة التوجيه بطريقتين لضمان عمل إحداهما
         try {
-          router.push('/dashboard')
+          // استخدام router.replace بدلاً من router.push لمنع العودة إلى صفحة تسجيل الدخول
+          router.replace('/dashboard')
         } catch (error) {
-          // استخدم window.location كخطة بديلة إذا فشل router
+          console.error('Router navigation error:', error)
+          // استخدم window.location كخطة بديلة
           window.location.href = '/dashboard'
         }
       }
@@ -52,11 +53,22 @@ export default function LoginPage() {
       setIsLoading(false)
       
       if (success) {
-        // تأخير قصير جدًا للتأكد من اكتمال تحديث حالة تسجيل الدخول
-        // ثم التوجيه مباشرة إلى لوحة التحكم
+        // تعيين ملف تعريف ارتباط بالإضافة إلى localStorage للمساعدة في التوجيه
+        document.cookie = "user-logged-in=true; path=/; max-age=86400";
+        
+        // استخدام router.replace بدلاً من router.push لإجبار إعادة التوجيه
+        router.replace('/dashboard')
+        
+        // تأكيد من تحديث localStorage فورًا
+        localStorage.setItem('user-logged-in', 'true')
+        
+        // استخدام خطة بديلة قوية إذا فشلت عملية إعادة التوجيه الأولى
         setTimeout(() => {
-          window.location.href = '/dashboard'
-        }, 100)
+          if (window.location.pathname.includes('/login')) {
+            // تجاهل التاريخ تمامًا عند الانتقال
+            window.location.replace('/dashboard')
+          }
+        }, 500)
       } else {
         setError('اسم المستخدم أو كلمة المرور غير صحيحة')
       }

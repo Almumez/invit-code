@@ -64,7 +64,7 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       checked={checked}
       onChange={(e, checked) => onCheckedChange?.(checked)}
       className={cn(className)}
-      {...props}
+    {...props}
     />
   )
 );

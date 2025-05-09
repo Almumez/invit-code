@@ -81,15 +81,15 @@ const AccordionTrigger = React.forwardRef<
   AccordionTriggerProps
 >(({ className, children, ...props }, ref) => (
   <StyledAccordionSummary
-    ref={ref}
+      ref={ref}
     expandIcon={<ExpandMoreIcon />}
-    className={cn(
+      className={cn(
       'flex-1 font-medium transition-all',
-      className
-    )}
-    {...props}
-  >
-    {children}
+        className
+      )}
+      {...props}
+    >
+      {children}
   </StyledAccordionSummary>
 ));
 AccordionTrigger.displayName = 'AccordionTrigger';
