@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
 import { useVisitStore } from '@/lib/store/visit-store'
+import { useDashboardStore } from '@/lib/store/dashboard-store'
 import React from 'react'
 import { 
   Card, 
@@ -33,58 +34,76 @@ import {
 } from 'recharts'
 
 export default function DashboardPage() {
-  const { inviteCodes, isLoading: isLoadingInvites, fetchInviteCodes } = useInviteStore()
-  const { stats, isLoading: isLoadingVisits, fetchVisitStats } = useVisitStore()
+  const { fetchInviteCodes } = useInviteStore()
+  const { fetchVisitStats } = useVisitStore()
+  const { 
+    stats, 
+    isLoading: isLoadingDashboard, 
+    fetchDashboardStats 
+  } = useDashboardStore()
   
   // استخدام useRef لمنع تكرار الاستدعاء
   const initialized = React.useRef(false);
   
   useEffect(() => {
     if (!initialized.current) {
-      fetchInviteCodes()
-      fetchVisitStats()
+      fetchDashboardStats()
       initialized.current = true;
     }
-  }, [fetchInviteCodes, fetchVisitStats])
-  
-  // إحصائيات للرموز
-  const totalCodes = inviteCodes.length
-  const activeCodes = inviteCodes.filter(code => code.isActive).length
-  const scannedCodes = inviteCodes.filter(code => !code.isActive).length
+  }, [fetchDashboardStats])
   
   // نسبة الرموز المستخدمة
-  const scannedPercentage = totalCodes > 0 ? Math.round((scannedCodes / totalCodes) * 100) : 0
-  const activePercentage = totalCodes > 0 ? Math.round((activeCodes / totalCodes) * 100) : 0
+  const scannedPercentage = stats.codes.total > 0 
+    ? Math.round((stats.codes.used / stats.codes.total) * 100) 
+    : 0
+    
+  const activePercentage = stats.codes.total > 0 
+    ? Math.round((stats.codes.active / stats.codes.total) * 100) 
+    : 0
   
   // بيانات للمخطط الدائري
   const pieData = [
-    { name: 'الرموز المستخدمة', value: scannedCodes, color: '#4f46e5' },
-    { name: 'الرموز المتبقية', value: activeCodes, color: '#93c5fd' }
+    { name: 'الرموز المستخدمة', value: stats.codes.used, color: '#4f46e5' },
+    { name: 'الرموز المتبقية', value: stats.codes.active, color: '#93c5fd' }
   ]
   
-  // بيانات للمخطط الخطي - بيانات تمثيلية للأيام السبعة الماضية
-  const generateWeeklyData = () => {
-    const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-    return days.map((day, index) => {
-      // بيانات تمثيلية - في الواقع ستأتي من قاعدة البيانات
-      const scanned = Math.floor(Math.random() * 15) + 1;
-      const active = Math.floor(Math.random() * 10) + 1;
-      const total = scanned + active;
+  // بيانات المخطط الخطي - استخدام البيانات الحقيقية من الإحصائيات
+  const weeklyData = React.useMemo(() => {
+    if (stats.codes.weeklyStats.length === 0) {
+      // بيانات تمثيلية في حالة عدم وجود إحصائيات
+      const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+      return days.map((day, index) => {
+        // بيانات تمثيلية - في الواقع ستأتي من قاعدة البيانات
+        const scanned = Math.floor(Math.random() * 15) + 1;
+        const active = Math.floor(Math.random() * 10) + 1;
+        return {
+          name: day,
+          'رموز مستخدمة': scanned,
+          'رموز متبقية': active,
+          'رموز جديدة': Math.floor(Math.random() * 5)
+        };
+      });
+    }
+    
+    // استخدام البيانات الحقيقية
+    return stats.codes.weeklyStats.map(day => {
+      // تحويل التاريخ إلى اسم اليوم بالعربية
+      const date = new Date(day.date);
+      const dayName = date.toLocaleDateString('ar-SA', { weekday: 'long' });
+      
       return {
-        name: day,
-        'رموز مستخدمة': scanned,
-        'رموز متبقية': active,
-        'رموز جديدة': Math.floor(Math.random() * 5)
+        name: dayName,
+        'رموز مستخدمة': day.used,
+        'رموز جديدة': day.added,
+        date: day.date
       };
-    });
-  };
-  
-  const weeklyData = React.useMemo(() => generateWeeklyData(), []);
+    }).reverse(); // عكس الترتيب ليكون التاريخ الأحدث على اليمين
+  }, [stats.codes.weeklyStats]);
   
   // بيانات للمخطط الشريطي - توزيع الزيارات
   const visitData = React.useMemo(() => {
-    if (stats.paths && stats.paths.length > 0) {
-      return stats.paths.map(item => ({
+    if (stats.visits.pathStats.length > 0) {
+      return stats.visits.pathStats.map(item => ({
         path: item.path === '/' ? 'الرئيسية' : item.path.replace('/', ''),
         زيارات: item._count.path
       })).slice(0, 5); // أخذ أعلى 5 مسارات زيارة
@@ -97,7 +116,25 @@ export default function DashboardPage() {
       { path: 'الملف الشخصي', زيارات: 10 },
       { path: 'الإعدادات', زيارات: 5 }
     ];
-  }, [stats.paths]);
+  }, [stats.visits.pathStats]);
+  
+  // بيانات زيارات الأيام
+  const dailyVisitData = React.useMemo(() => {
+    if (stats.visits.dailyVisits.length > 0) {
+      return stats.visits.dailyVisits.map(day => {
+        // تحويل التاريخ إلى اسم اليوم بالعربية
+        const date = new Date(day.date);
+        const dayName = date.toLocaleDateString('ar-SA', { weekday: 'long' });
+        
+        return {
+          name: dayName,
+          زيارات: day.visits,
+          date: day.date
+        };
+      }).reverse(); // عكس الترتيب ليكون التاريخ الأحدث على اليمين
+    }
+    return [];
+  }, [stats.visits.dailyVisits]);
   
   return (
     <div className="space-y-8">
@@ -109,7 +146,9 @@ export default function DashboardPage() {
               <div>
                 <div className="text-dashboard-text-muted text-sm font-medium mb-1">إجمالي الرموز</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  {totalCodes}
+                  {isLoadingDashboard ? (
+                    <LoaderIcon className="h-6 w-6 animate-spin text-primary-500" />
+                  ) : stats.codes.total}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
                   جميع الرموز في النظام
@@ -129,7 +168,9 @@ export default function DashboardPage() {
               <div>
                 <div className="text-dashboard-text-muted text-sm font-medium mb-1">الرموز المتبقية</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  {activeCodes}
+                  {isLoadingDashboard ? (
+                    <LoaderIcon className="h-6 w-6 animate-spin text-primary-500" />
+                  ) : stats.codes.active}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
                   <span className="text-green-500">{activePercentage}%</span> من إجمالي الرموز
@@ -160,7 +201,9 @@ export default function DashboardPage() {
               <div>
                 <div className="text-dashboard-text-muted text-sm font-medium mb-1">الرموز المستخدمة</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  {scannedCodes}
+                  {isLoadingDashboard ? (
+                    <LoaderIcon className="h-6 w-6 animate-spin text-primary-500" />
+                  ) : stats.codes.used}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
                   <span className="text-blue-500">{scannedPercentage}%</span> من إجمالي الرموز
@@ -191,13 +234,13 @@ export default function DashboardPage() {
               <div>
                 <div className="text-dashboard-text-muted text-sm font-medium mb-1">الزيارات</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  {isLoadingVisits ? (
+                  {isLoadingDashboard ? (
                     <LoaderIcon className="h-6 w-6 animate-spin text-primary-500" />
-                  ) : stats.total}
+                  ) : stats.visits.total}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  <span className="text-green-500">+{stats.today}</span> اليوم،{' '}
-                  <span className="text-blue-500">{stats.weekly}</span> هذا الأسبوع
+                  <span className="text-green-500">+{stats.visits.today}</span> اليوم،{' '}
+                  <span className="text-blue-500">{stats.visits.week}</span> هذا الأسبوع
                 </div>
               </div>
               <div className="bg-gradient-to-br from-purple-500 to-fuchsia-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
@@ -210,12 +253,15 @@ export default function DashboardPage() {
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                 <div 
                   className="bg-purple-500 h-2.5 rounded-full" 
-                  style={{ width: `${stats.weekly ? Math.min(100, (stats.today / stats.weekly) * 100) : 0}%` }}
+                  style={{ width: `${stats.visits.week ? Math.min(100, (stats.visits.today / stats.visits.week) * 100) : 0}%` }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-dashboard-text-muted">
                 <div>اليوم</div>
-                <div className="font-medium">{isLoadingVisits ? '...' : stats.weekly ? Math.round((stats.today / stats.weekly) * 100) : 0}% من الأسبوع</div>
+                <div className="font-medium">
+                  {isLoadingDashboard ? '...' : stats.visits.week ? 
+                    Math.round((stats.visits.today / stats.visits.week) * 100) : 0}% من الأسبوع
+                </div>
               </div>
             </div>
           </CardContent>
@@ -236,7 +282,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="relative h-[340px]">
-                {isLoadingInvites ? (
+                {isLoadingDashboard ? (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <LoaderIcon className="h-8 w-8 animate-spin text-primary-500" />
                   </div>
@@ -283,13 +329,6 @@ export default function DashboardPage() {
                           />
                           <Area 
                             type="monotone" 
-                            dataKey="رموز متبقية" 
-                            stroke="#60a5fa" 
-                            fillOpacity={1} 
-                            fill="url(#colorActive)" 
-                          />
-                          <Area 
-                            type="monotone" 
                             dataKey="رموز جديدة" 
                             stroke="#10b981" 
                             fillOpacity={1} 
@@ -315,7 +354,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="h-[260px] flex items-center justify-center">
-                {isLoadingInvites ? (
+                {isLoadingDashboard ? (
                   <LoaderIcon className="h-8 w-8 animate-spin text-primary-500" />
                 ) : (
                   <ResponsiveContainer width="100%" height={260}>
@@ -354,13 +393,13 @@ export default function DashboardPage() {
                 <div className="flex items-center p-2 rounded-lg bg-indigo-50 border border-indigo-100">
                   <div className="w-3 h-3 rounded-full bg-indigo-500 mr-3"></div>
                   <div className="flex-1 text-sm text-dashboard-text-muted">تم مسحها</div>
-                  <div className="font-medium text-dashboard-text">{scannedCodes}</div>
+                  <div className="font-medium text-dashboard-text">{stats.codes.used}</div>
                 </div>
                 
                 <div className="flex items-center p-2 rounded-lg bg-blue-50 border border-blue-100">
                   <div className="w-3 h-3 rounded-full bg-blue-300 mr-3"></div>
                   <div className="flex-1 text-sm text-dashboard-text-muted">متبقية</div>
-                  <div className="font-medium text-dashboard-text">{activeCodes}</div>
+                  <div className="font-medium text-dashboard-text">{stats.codes.active}</div>
                 </div>
               </div>
             </CardContent>
@@ -422,13 +461,13 @@ export default function DashboardPage() {
                 </div>
               </div>
               
-              {/* مخطط خطي للأداء */}
+              {/* مخطط خطي للزيارات اليومية */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium text-dashboard-text">معدل مسح الرموز</h3>
+                <h3 className="text-base font-medium text-dashboard-text">الزيارات اليومية</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
-                      data={weeklyData}
+                      data={dailyVisitData}
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -445,19 +484,11 @@ export default function DashboardPage() {
                       <Legend />
                       <Line 
                         type="monotone" 
-                        dataKey="رموز مستخدمة" 
-                        stroke="#4f46e5" 
+                        dataKey="زيارات" 
+                        stroke="#8884d8" 
                         strokeWidth={2}
                         dot={{ r: 4 }}
-                        activeDot={{ r: 6, stroke: '#4f46e5', strokeWidth: 2, fill: 'white' }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="رموز جديدة" 
-                        stroke="#10b981" 
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6, stroke: '#10b981', strokeWidth: 2, fill: 'white' }}
+                        activeDot={{ r: 6, stroke: '#8884d8', strokeWidth: 2, fill: 'white' }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -468,32 +499,36 @@ export default function DashboardPage() {
             {/* معلومات إضافية */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               <div className="bg-dashboard-bg rounded-lg p-4 border border-dashboard-border">
-                <div className="text-sm text-dashboard-text-muted">معدل المسح اليومي</div>
+                <div className="text-sm text-dashboard-text-muted">رموز مضافة هذا الأسبوع</div>
                 <div className="text-2xl font-bold text-dashboard-text mt-2">
-                  {totalCodes > 0 ? Math.round((scannedCodes / totalCodes) * 100) / 100 : 0}%
+                  {stats.codes.week}
                 </div>
                 <div className="text-xs text-green-500 mt-1">
-                  ↑ 12% مقارنة بالأسبوع الماضي
+                  ↑ {stats.codes.todayUsed} تم استخدامها اليوم
                 </div>
               </div>
               
               <div className="bg-dashboard-bg rounded-lg p-4 border border-dashboard-border">
-                <div className="text-sm text-dashboard-text-muted">وقت الذروة</div>
+                <div className="text-sm text-dashboard-text-muted">معدل الاستخدام اليومي</div>
                 <div className="text-2xl font-bold text-dashboard-text mt-2">
-                  17:00 - 19:00
+                  {stats.codes.yesterday > 0 
+                    ? Math.round((stats.codes.todayUsed / stats.codes.yesterday) * 100) 
+                    : 0}%
                 </div>
                 <div className="text-xs text-blue-500 mt-1">
-                  30% من الرموز تستخدم خلال هذه الفترة
+                  مقارنة بالأمس
                 </div>
               </div>
               
               <div className="bg-dashboard-bg rounded-lg p-4 border border-dashboard-border">
-                <div className="text-sm text-dashboard-text-muted">نسبة النجاح</div>
+                <div className="text-sm text-dashboard-text-muted">نسبة النمو الشهرية</div>
                 <div className="text-2xl font-bold text-dashboard-text mt-2">
-                  98.5%
+                  {stats.codes.month > 0 
+                    ? Math.round((stats.codes.week / stats.codes.month) * 100) 
+                    : 0}%
                 </div>
                 <div className="text-xs text-green-500 mt-1">
-                  ↑ 2.5% تحسن منذ آخر تحديث
+                  مقارنة بالشهر الماضي
                 </div>
               </div>
             </div>

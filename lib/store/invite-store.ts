@@ -18,10 +18,21 @@ export type PaginationData = {
   hasPrevPage: boolean
 }
 
+export type StatsData = {
+  total: number
+  active: number
+  used: number
+  today: number
+  week: number
+  month: number
+}
+
 type InviteStore = {
   inviteCodes: InviteCode[]
   pagination: PaginationData
+  stats: StatsData
   isLoading: boolean
+  isLoadingStats: boolean
   error: string | null
   
   // Pagination and filtering state
@@ -31,6 +42,7 @@ type InviteStore = {
   
   // Methods
   fetchInviteCodes: (options?: { page?: number, search?: string, status?: string }) => Promise<void>
+  fetchStats: () => Promise<void>
   setPage: (page: number) => void
   setSearchTerm: (term: string) => void
   setFilterStatus: (status: string) => void
@@ -53,13 +65,37 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
     hasNextPage: false,
     hasPrevPage: false
   },
+  stats: {
+    total: 0,
+    active: 0,
+    used: 0,
+    today: 0,
+    week: 0,
+    month: 0
+  },
   isLoading: false,
+  isLoadingStats: false,
   error: null,
   
   // Pagination and filtering state
   currentPage: 1,
   searchTerm: '',
   filterStatus: 'all',
+
+  // Fetch stats for dashboard
+  fetchStats: async () => {
+    set({ isLoadingStats: true })
+    try {
+      const response = await fetch('/api/invite-codes/stats')
+      if (!response.ok) throw new Error('فشل في جلب إحصائيات رموز الدعوة')
+      
+      const stats = await response.json()
+      set({ stats, isLoadingStats: false })
+    } catch (error) {
+      console.error('خطأ في جلب الإحصائيات:', error)
+      set({ isLoadingStats: false })
+    }
+  },
 
   // Set pagination page
   setPage: (page: number) => {
@@ -113,6 +149,9 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
         currentPage: pagination.page,
         isLoading: false 
       })
+
+      // تحديث الإحصائيات بعد الحصول على البيانات
+      await get().fetchStats()
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
@@ -128,6 +167,7 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       })
       if (!response.ok) throw new Error('فشل في إضافة رمز الدعوة')
       await get().fetchInviteCodes()
+      await get().fetchStats() // تحديث الإحصائيات
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
@@ -143,6 +183,7 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       })
       if (!response.ok) throw new Error('فشل في تحديث رمز الدعوة')
       await get().fetchInviteCodes()
+      await get().fetchStats() // تحديث الإحصائيات
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
@@ -156,6 +197,7 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       })
       if (!response.ok) throw new Error('فشل في حذف رمز الدعوة')
       await get().fetchInviteCodes()
+      await get().fetchStats() // تحديث الإحصائيات
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
@@ -185,6 +227,7 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       })
       if (!response.ok) throw new Error('فشل في توليد رموز الدعوة')
       await get().fetchInviteCodes()
+      await get().fetchStats() // تحديث الإحصائيات
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false })
     }
@@ -203,6 +246,7 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       
       if (data.success) {
         await get().fetchInviteCodes()
+        await get().fetchStats() // تحديث الإحصائيات
       }
       
       set({ isLoading: false })

@@ -60,19 +60,58 @@ import {
   LoaderIcon, 
   AlertCircleIcon, 
   RefreshCwIcon,
-  FilterIcon
+  FilterIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  BarChart3Icon,
+  CalculatorIcon
 } from 'lucide-react'
+
+// مكون البطاقة الإحصائية
+function StatCard({ title, value, icon, description, isLoading, className }: { 
+  title: string
+  value: number | string
+  icon: React.ReactNode
+  description?: string
+  isLoading: boolean
+  className?: string
+}) {
+  return (
+    <Card className={`bg-white shadow-sm border-dashboard-border ${className}`}>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-dashboard-text-muted">{title}</p>
+            <h3 className="text-2xl font-bold mt-1 text-dashboard-text">
+              {isLoading ? "..." : value}
+            </h3>
+            {description && (
+              <p className="text-xs mt-1 text-dashboard-text-muted">{description}</p>
+            )}
+          </div>
+          <div className="h-12 w-12 rounded-full bg-primary-50 flex items-center justify-center text-primary-500">
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function InviteCodesPage() {
   const { 
     inviteCodes, 
     pagination,
+    stats,
     isLoading,
+    isLoadingStats,
     error,
     currentPage,
     searchTerm,
     filterStatus,
     fetchInviteCodes, 
+    fetchStats,
     setPage,
     setSearchTerm,
     setFilterStatus,
@@ -94,7 +133,8 @@ export default function InviteCodesPage() {
   
   useEffect(() => {
     fetchInviteCodes()
-  }, [fetchInviteCodes])
+    fetchStats()
+  }, [fetchInviteCodes, fetchStats])
   
   const handleAddCode = async () => {
     if (newCode.trim()) {
@@ -147,6 +187,13 @@ export default function InviteCodesPage() {
     </Button>
   )
   
+  // حساب معدل النمو
+  const calculateGrowthRate = (current: number, previous: number): string => {
+    if (previous === 0) return '0%';
+    const rate = ((current - previous) / previous) * 100;
+    return `${rate > 0 ? '+' : ''}${Math.round(rate)}%`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Card */}
@@ -160,7 +207,7 @@ export default function InviteCodesPage() {
               <div>
                 <h1 className="text-xl font-bold text-dashboard-text">إدارة رموز الدعوة</h1>
                 <p className="text-dashboard-text-muted text-sm">
-                  إدارة وتتبع {pagination.totalCount} رمز دعوة ({inviteCodes.filter(code => code.isActive).length} نشط, {inviteCodes.filter(code => !code.isActive).length} مستخدم)
+                  إدارة وتتبع {isLoadingStats ? "..." : stats.total} رمز دعوة ({isLoadingStats ? "..." : stats.active} نشط, {isLoadingStats ? "..." : stats.used} مستخدم)
                 </p>
               </div>
             </div>
@@ -221,6 +268,165 @@ export default function InviteCodesPage() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* إحصائيات رموز الدعوة */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard 
+          title="إجمالي رموز الدعوة"
+          value={stats.total}
+          icon={<CalculatorIcon className="h-6 w-6" />}
+          isLoading={isLoadingStats}
+        />
+        
+        <StatCard 
+          title="الرموز النشطة"
+          value={stats.active}
+          description={`${stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}% من الإجمالي`}
+          icon={<CheckCircleIcon className="h-6 w-6" />}
+          isLoading={isLoadingStats}
+          className="border-r-4 border-r-green-500"
+        />
+        
+        <StatCard 
+          title="الرموز المستخدمة"
+          value={stats.used}
+          description={`${stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}% من الإجمالي`}
+          icon={<XCircleIcon className="h-6 w-6" />}
+          isLoading={isLoadingStats}
+          className="border-r-4 border-r-red-500"
+        />
+        
+        <StatCard 
+          title="رموز مضافة اليوم"
+          value={stats.today}
+          icon={<CalendarIcon className="h-6 w-6" />}
+          isLoading={isLoadingStats}
+          className="border-r-4 border-r-blue-500"
+        />
+      </div>
+      
+      {/* إحصائيات النمو */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="bg-white shadow-sm border-dashboard-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-medium flex items-center text-dashboard-text">
+              <BarChart3Icon className="h-5 w-5 mr-2 text-primary-500" />
+              تحليل رموز الدعوة
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-dashboard-border">
+                <span className="text-sm text-dashboard-text-muted">خلال الأسبوع الماضي</span>
+                <div className="flex items-center">
+                  <span className="text-lg font-bold text-dashboard-text">{isLoadingStats ? "..." : stats.week}</span>
+                  {!isLoadingStats && stats.week > 0 && (
+                    <span className={`text-xs mr-2 ${(stats.week - stats.today) < stats.today ? 'text-green-500' : 'text-red-500'}`}>
+                      {calculateGrowthRate(stats.today, (stats.week - stats.today))}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center pb-2 border-b border-dashboard-border">
+                <span className="text-sm text-dashboard-text-muted">خلال الشهر الماضي</span>
+                <div className="flex items-center">
+                  <span className="text-lg font-bold text-dashboard-text">{isLoadingStats ? "..." : stats.month}</span>
+                  {!isLoadingStats && stats.month > 0 && (
+                    <span className={`text-xs mr-2 ${(stats.month - stats.week) < stats.week ? 'text-green-500' : 'text-red-500'}`}>
+                      {calculateGrowthRate(stats.week, (stats.month - stats.week))}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-dashboard-text-muted">متوسط الاستخدام</span>
+                <div className="flex items-center">
+                  <span className="text-lg font-bold text-dashboard-text">
+                    {isLoadingStats ? "..." : `${stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white shadow-sm border-dashboard-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-medium flex items-center text-dashboard-text">
+              <TicketIcon className="h-5 w-5 mr-2 text-primary-500" />
+              حالة رموز الدعوة
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="relative pt-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold inline-block text-green-600">
+                      نشطة
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold inline-block text-green-600">
+                      {isLoadingStats ? "..." : `${stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%`}
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+                  <div 
+                    style={{ width: `${isLoadingStats ? 0 : (stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0)}%` }} 
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500 transition-all duration-500">
+                  </div>
+                </div>
+              </div>
+              
+              <div className="relative pt-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold inline-block text-red-600">
+                      مستخدمة
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold inline-block text-red-600">
+                      {isLoadingStats ? "..." : `${stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%`}
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-red-200">
+                  <div 
+                    style={{ width: `${isLoadingStats ? 0 : (stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0)}%` }} 
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500 transition-all duration-500">
+                  </div>
+                </div>
+              </div>
+              
+              <div className="relative pt-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold inline-block text-blue-600">
+                      اليوم
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold inline-block text-blue-600">
+                      {isLoadingStats ? "..." : `${stats.total > 0 ? Math.round((stats.today / stats.total) * 100) : 0}%`}
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                  <div 
+                    style={{ width: `${isLoadingStats ? 0 : (stats.total > 0 ? Math.round((stats.today / stats.total) * 100) : 0)}%` }} 
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 transition-all duration-500">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       
       {/* Main Card */}
       <Card className="bg-white shadow-sm border-dashboard-border">
@@ -409,7 +615,7 @@ export default function InviteCodesPage() {
         {!isLoading && !error && inviteCodes.length > 0 && (
           <CardFooter className="border-t border-dashboard-border bg-white py-3 px-6 flex flex-col sm:flex-row justify-between gap-3 items-center">
             <div className="text-xs text-dashboard-text-muted">
-              عرض {inviteCodes.length} من إجمالي {pagination.totalCount} رمز
+              عرض {inviteCodes.length} من إجمالي {isLoadingStats ? "..." : stats.total} رمز
               {(searchTerm || filterStatus !== "all") && " بعد التصفية"}
             </div>
             
