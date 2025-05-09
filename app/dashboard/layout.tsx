@@ -1,5 +1,8 @@
+'use client'
+
 import { ReactNode } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { 
   Home, 
@@ -15,6 +18,8 @@ export default function DashboardLayout({
 }: {
   children: ReactNode
 }) {
+  const pathname = usePathname()
+
   return (
     <div className="min-h-screen bg-dashboard-bg text-dashboard-text">
       <div className="flex min-h-screen">
@@ -43,17 +48,37 @@ export default function DashboardLayout({
             <div className="flex flex-col space-y-1">
               <Link
                 href="/dashboard"
-                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
+                className={cn(
+                  "flex items-center px-3 py-2.5 rounded-lg text-dashboard-text transition-colors group",
+                  pathname === "/dashboard" 
+                    ? "bg-dashboard-accent text-white font-medium shadow-sm" 
+                    : "hover:bg-dashboard-bg"
+                )}
               >
-                <Home className="h-5 w-5 ml-3 text-dashboard-accent" />
+                <Home className={cn(
+                  "h-5 w-5 ml-3", 
+                  pathname === "/dashboard" 
+                    ? "text-white" 
+                    : "text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors"
+                )} />
                 <span>لوحة التحكم</span>
               </Link>
               
               <Link
                 href="/dashboard/generate"
-                className="flex items-center px-3 py-2.5 rounded-lg text-dashboard-text hover:bg-dashboard-bg transition-colors group"
+                className={cn(
+                  "flex items-center px-3 py-2.5 rounded-lg text-dashboard-text transition-colors group",
+                  pathname === "/dashboard/generate" 
+                    ? "bg-dashboard-accent text-white font-medium shadow-sm" 
+                    : "hover:bg-dashboard-bg"
+                )}
               >
-                <TicketIcon className="h-5 w-5 ml-3 text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors" />
+                <TicketIcon className={cn(
+                  "h-5 w-5 ml-3", 
+                  pathname === "/dashboard/generate" 
+                    ? "text-white" 
+                    : "text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors"
+                )} />
                 <span>توليد رموز الدعوة</span>
               </Link>
               

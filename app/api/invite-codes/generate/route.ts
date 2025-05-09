@@ -21,9 +21,9 @@ export async function POST(request: Request) {
     const { count, length } = await request.json()
     
     // Validate input
-    if (!count || !length || count <= 0 || length <= 0 || count > 100) {
+    if (!count || !length || count <= 0 || length <= 0 || count > 1000) {
       return NextResponse.json(
-        { error: 'عدد الرموز أو طول الرمز غير صالح. الحد الأقصى هو 100 رمز.' },
+        { error: 'عدد الرموز أو طول الرمز غير صالح. الحد الأقصى هو 1000 رمز.' },
         { status: 400 }
       )
     }

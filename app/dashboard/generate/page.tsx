@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
 import { 
   Card, 
@@ -9,6 +9,10 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card'
+import { 
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -17,7 +21,8 @@ import {
   PlusIcon, 
   LoaderIcon, 
   CheckCircle,
-  BarChart2
+  BarChart2,
+  Sparkles
 } from 'lucide-react'
 
 export default function GeneratePage() {
@@ -25,9 +30,27 @@ export default function GeneratePage() {
   
   // إضافة حالة لنموذج توليد الدعوات
   const [generationCount, setGenerationCount] = useState(5)
-  const [codeLength, setCodeLength] = useState(8)
+  const [codeLength, setCodeLength] = useState(11)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generationSuccess, setGenerationSuccess] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [generationProgress, setGenerationProgress] = useState(0)
+  
+  // تتبع تقدم عملية التوليد
+  useEffect(() => {
+    if (isGenerating && showPopup) {
+      const interval = setInterval(() => {
+        setGenerationProgress(prev => {
+          const newProgress = prev + Math.random() * 10;
+          return newProgress >= 100 ? 100 : newProgress;
+        });
+      }, 300);
+      
+      return () => clearInterval(interval);
+    } else if (!isGenerating) {
+      setGenerationProgress(0);
+    }
+  }, [isGenerating, showPopup]);
   
   // وظيفة لتوليد رموز الدعوة
   const handleGenerateCodes = async () => {
@@ -35,13 +58,23 @@ export default function GeneratePage() {
     
     setIsGenerating(true)
     setGenerationSuccess(false)
+    setShowPopup(true)
+    setGenerationProgress(0)
+    
     try {
       await generateInviteCodes(generationCount, codeLength)
       setGenerationSuccess(true)
+      
+      // إغلاق الـ popup بعد اكتمال العملية
+      setTimeout(() => {
+        setShowPopup(false)
+      }, 1500)
+      
       // إخفاء رسالة النجاح بعد 3 ثوان
       setTimeout(() => setGenerationSuccess(false), 3000)
     } catch (error) {
       console.error('Error generating codes:', error)
+      setShowPopup(false)
     } finally {
       setIsGenerating(false)
     }
@@ -119,12 +152,12 @@ export default function GeneratePage() {
                   id="generation-count"
                   type="number"
                   min="1"
-                  max="100"
+                  max="1000"
                   value={generationCount}
                   onChange={(e) => setGenerationCount(Number(e.target.value))}
                   className="bg-dashboard-bg border-dashboard-border text-dashboard-text"
                 />
-                <p className="text-xs text-dashboard-text-muted">أدخل عدد الرموز التي ترغب في إنشائها (الحد الأقصى: 100)</p>
+                <p className="text-xs text-dashboard-text-muted">أدخل عدد الرموز التي ترغب في إنشائها (الحد الأقصى: 1000)</p>
               </div>
 
               <div className="space-y-2">
@@ -143,7 +176,7 @@ export default function GeneratePage() {
 
               <Button 
                 onClick={handleGenerateCodes} 
-                disabled={isGenerating || generationCount <= 0 || generationCount > 100 || codeLength < 4 || codeLength > 16}
+                disabled={isGenerating || generationCount <= 0 || generationCount > 1000 || codeLength < 4 || codeLength > 16}
                 className="mt-4 bg-dashboard-accent hover:bg-dashboard-accent-hover text-white shadow-sm"
               >
                 {isGenerating ? (
@@ -180,7 +213,7 @@ export default function GeneratePage() {
                 </li>
                 <li className="flex items-start">
                   <div className="ml-2 mt-1 h-2 w-2 rounded-full bg-primary-500"></div>
-                  <span>يمكنك توليد حتى 100 رمز دفعة واحدة</span>
+                  <span>يمكنك توليد حتى 1000 رمز دفعة واحدة</span>
                 </li>
                 <li className="flex items-start">
                   <div className="ml-2 mt-1 h-2 w-2 rounded-full bg-primary-500"></div>
@@ -191,6 +224,62 @@ export default function GeneratePage() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* نافذة منبثقة لعرض حالة التوليد */}
+      <Dialog open={showPopup} onOpenChange={setShowPopup}>
+        <DialogContent className="bg-white sm:max-w-md text-center p-0 overflow-hidden rounded-xl">
+          <div className="relative">
+            {/* خلفية متحركة */}
+            <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden">
+              <div className="absolute -inset-10 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 opacity-50 animate-gradient-bg"></div>
+              <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/60"></div>
+            </div>
+            
+            <div className="relative p-8 flex flex-col items-center justify-center">
+              <div className="w-20 h-20 mb-5 flex items-center justify-center rounded-full bg-primary-50 border-4 border-primary-100 animate-float">
+                <div className="relative">
+                  <TicketIcon className="w-8 h-8 text-primary-500" />
+                  <div className="absolute -top-1 -right-1">
+                    <Sparkles className="w-4 h-4 text-primary-700 animate-sparkle" />
+                  </div>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-dashboard-text mb-2">جاري توليد الرموز</h3>
+              <p className="text-dashboard-text-muted mb-4">يرجى الانتظار حتى اكتمال العملية...</p>
+
+              {/* شريط التقدم */}
+              <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
+                <div 
+                  className="h-full bg-gradient-to-l from-primary-400 to-primary-600 rounded-full transition-all duration-300" 
+                  style={{ width: `${generationProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-dashboard-text-muted mb-6">
+                {Math.round(generationProgress)}% {generationProgress < 100 
+                  ? "جاري إنشاء الرموز وحفظها في قاعدة البيانات..." 
+                  : "تم الانتهاء! جاري إغلاق النافذة..."}
+              </p>
+              
+              {/* أيقونات متحركة */}
+              <div className="flex justify-center items-center space-x-8 rtl:space-x-reverse mt-2">
+                {[...Array(5)].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="relative" 
+                    style={{ animationDelay: `${i * 150}ms`, animationDuration: '1s', transform: `translateY(${Math.sin(i) * 10}px)` }}
+                  >
+                    <TicketIcon 
+                      className="w-6 h-6 text-primary-400 animate-float" 
+                      style={{ animationDelay: `${i * 300}ms` }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
-} 
+}
