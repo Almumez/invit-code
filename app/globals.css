@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* دعم RTL للعناصر */
+[dir="rtl"] .ltr-icon {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .ltr-element {
+  direction: ltr;
+}
+
+/* تحسينات الخط العربي */
+html[dir="rtl"] {
+  font-feature-settings: "tnum", "ss01", "ss02";
+  text-shadow: 0 0 1px transparent;
+  font-feature-settings: "kern";
+  letter-spacing: 0;
+}
+
+/* لتحسين عرض العناصر في RTL */
+[dir="rtl"] .reverse-rtl {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .mirror-rtl {
+  transform: scaleX(-1);
+}
+
+@layer utilities {
+  .rtl-rotate-180 {
+    transform: rotateY(180deg);
+  }
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 245, 245, 245;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 10, 10, 10;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 0%;
+    --chart-1: 0 0% 20%;
+    --chart-2: 0 0% 40%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 80%;
+    --chart-5: 0 0% 90%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 100%;
+    --chart-1: 0 0% 90%;
+    --chart-2: 0 0% 70%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 0 0% 30%;
+    --chart-5: 0 0% 10%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* المتغيرات اللونية للتدرجات */
+:root {
+  --gradient-primary: from-black via-gray-600 to-black;
+  --gradient-primary-hover: from-gray-900 via-gray-700 to-gray-900;
+  --gradient-glass: bg-white/10 backdrop-blur-md border-white/20;
+}
+
+/* تأثيرات التدرج اللوني المتحرك */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 300% 300%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* تأثير النبض للعناصر المهمة */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.pulse-animation {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* تأثير ظل مشع للبطاقات */
+.card-glow {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1),
+              0 0 30px rgba(0, 0, 0, 0.1),
+              0 0 50px rgba(50, 50, 50, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2),
+              0 0 40px rgba(0, 0, 0, 0.2),
+              0 0 70px rgba(50, 50, 50, 0.1);
+}
+
+/* تأثيرات زجاجية محسنة */
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  backdrop-filter: blur(10px);
+}
+
+.glass-effect-dark {
+  @apply bg-black/20 backdrop-blur-md border border-white/10;
+  backdrop-filter: blur(12px);
+}
+
+/* تأثيرات حركية للأزرار */
+.button-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.button-hover-effect:hover {
+  transform: translateY(-2px);
+}
+
+.button-hover-effect:active {
+  transform: translateY(1px);
+}
+
+/* تأثير تموج الخلفية */
+.wavy-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.wavy-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+/* فئات تأخير الرسوم المتحركة */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Custom gradient animations */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 300% 300%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Improved glassmorphism effect */
+.glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+}
+
+/* Button glow effect */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #000, #333, #000, #333);
+  background-size: 400% 400%;
+  z-index: -1;
+  animation: gradient-shift 3s ease infinite;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-glow:hover::after {
+  opacity: 1;
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  @apply bg-gradient-to-r from-black via-gray-800 to-black;
+  @apply bg-[length:200%_200%] animate-gradient;
+}
+
+.gradient-secondary {
+  @apply bg-gradient-to-br from-gray-200 via-white to-gray-300;
+  @apply bg-[length:200%_200%] animate-gradient;
+}
+
+.gradient-accent {
+  @apply bg-gradient-to-tr from-gray-900 via-black to-gray-800;
+  @apply bg-[length:200%_200%] animate-gradient;
+}
+
+/* Subtle shadow */
+.shadow-soft {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
