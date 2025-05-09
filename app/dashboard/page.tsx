@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
+import { useVisitStore } from '@/lib/store/visit-store'
 import { 
   Card, 
   CardContent, 
@@ -17,18 +18,20 @@ import {
   LoaderIcon, 
   BarChart4,
   Users,
-  ShoppingBag,
   MoreVertical,
   ArrowRightIcon,
+  Globe
 } from 'lucide-react'
 
 export default function DashboardPage() {
-  const { inviteCodes, isLoading, fetchInviteCodes } = useInviteStore()
+  const { inviteCodes, isLoading: isLoadingInvites, fetchInviteCodes } = useInviteStore()
+  const { stats, isLoading: isLoadingVisits, fetchVisitStats } = useVisitStore()
   
   useEffect(() => {
     fetchInviteCodes()
-  }, [fetchInviteCodes])
-
+    fetchVisitStats()
+  }, [fetchInviteCodes, fetchVisitStats])
+  
   // إحصائيات للرموز
   const totalCodes = inviteCodes.length
   const activeCodes = inviteCodes.filter(code => code.isActive).length
@@ -123,20 +126,38 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
+        {/* كارد الزيارات */}
         <Card className="materio-card">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-dashboard-text-muted text-sm font-medium mb-1">الطلبات</div>
+                <div className="text-dashboard-text-muted text-sm font-medium mb-1">الزيارات</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  36
+                  {isLoadingVisits ? (
+                    <LoaderIcon className="h-6 w-6 animate-spin text-primary-500" />
+                  ) : stats.total}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  <span className="text-green-500">+12</span> هذا الشهر
+                  <span className="text-green-500">+{stats.today}</span> اليوم،{' '}
+                  <span className="text-blue-500">{stats.weekly}</span> هذا الأسبوع
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-amber-500 to-orange-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
-                <ShoppingBag className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-br from-purple-500 to-fuchsia-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            
+            {/* شريط تقدم الزيارات اليوم مقارنة بالأسبوع */}
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div 
+                  className="bg-purple-500 h-2.5 rounded-full" 
+                  style={{ width: `${stats.weekly ? Math.min(100, (stats.today / stats.weekly) * 100) : 0}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs text-dashboard-text-muted">
+                <div>اليوم</div>
+                <div className="font-medium">{isLoadingVisits ? '...' : stats.weekly ? Math.round((stats.today / stats.weekly) * 100) : 0}% من الأسبوع</div>
               </div>
             </div>
           </CardContent>
@@ -155,7 +176,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="relative h-64">
-                {isLoading ? (
+                {isLoadingInvites ? (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <LoaderIcon className="h-8 w-8 animate-spin text-primary-500" />
                   </div>

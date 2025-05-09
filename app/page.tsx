@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
+import { useVisitStore } from '@/lib/store/visit-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
@@ -9,6 +10,7 @@ import { CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material'
 
 export default function HomePage() {
   const { scanInviteCode } = useInviteStore()
+  const { recordVisit } = useVisitStore()
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<{ 
@@ -20,6 +22,11 @@ export default function HomePage() {
     valid: false,
     checked: false
   })
+  
+  // تسجيل زيارة عند فتح الصفحة
+  useEffect(() => {
+    recordVisit('/')
+  }, [recordVisit])
   
   const handleScan = async () => {
     if (!code.trim()) return
