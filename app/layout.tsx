@@ -3,6 +3,11 @@ import type { Metadata } from 'next';
 import { Tajawal } from 'next/font/google';
 import { ReactNode } from 'react'
 import ThemeRegistry from '@/components/ThemeRegistry'
+import { RTL } from '@/components/RTL'
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 const tajawal = Tajawal({ 
   subsets: ['arabic'],
@@ -24,9 +29,11 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className="light">
       <body className={`${tajawal.className} antialiased bg-dashboard-bg`}>
-        <ThemeRegistry>
-          {children}
-        </ThemeRegistry>
+        <RTL>
+          <ThemeRegistry>
+            {children}
+          </ThemeRegistry>
+        </RTL>
       </body>
     </html>
   );

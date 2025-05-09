@@ -12,7 +12,8 @@ import {
   Bell, 
   Clock,
   TicketIcon,
-  Globe
+  Globe,
+  QrCode
 } from 'lucide-react'
 
 export default function DashboardLayout({
@@ -80,6 +81,24 @@ export default function DashboardLayout({
                     : "text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors"
                 )} />
                 <span>لوحة التحكم</span>
+              </Link>
+              
+              <Link
+                href="/dashboard/codes"
+                className={cn(
+                  "flex items-center px-3 py-2.5 rounded-lg text-dashboard-text transition-colors group",
+                  pathname === "/dashboard/codes" 
+                    ? "bg-dashboard-accent text-white font-medium shadow-sm" 
+                    : "hover:bg-dashboard-bg"
+                )}
+              >
+                <QrCode className={cn(
+                  "h-5 w-5 ml-3", 
+                  pathname === "/dashboard/codes" 
+                    ? "text-white" 
+                    : "text-dashboard-text-muted group-hover:text-dashboard-accent transition-colors"
+                )} />
+                <span>إدارة رموز الدعوة</span>
               </Link>
               
               <Link
