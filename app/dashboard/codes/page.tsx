@@ -67,6 +67,7 @@ import {
   BarChart3Icon,
   CalculatorIcon
 } from 'lucide-react'
+import MuiSwitch from '@mui/material/Switch';
 
 // مكون البطاقة الإحصائية
 function StatCard({ title, value, icon, description, isLoading, className }: { 
@@ -563,56 +564,111 @@ export default function InviteCodesPage() {
       </Card>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text shadow-lg">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-primary-700">تعديل رمز الدعوة</DialogTitle>
-            <DialogDescription className="text-dashboard-text-muted">
+        <DialogContent dir="rtl" className="bg-white border-dashboard-border text-dashboard-text shadow-lg rounded-xl max-w-md mx-auto">
+          <DialogHeader className="pb-2 border-b border-gray-100">
+            <DialogTitle className="text-xl font-semibold text-primary-700 flex items-center">
+              <PencilIcon className="h-5 w-5 ml-2 text-primary-500" />
+              تعديل رمز الدعوة
+            </DialogTitle>
+            <DialogDescription className="text-dashboard-text-muted mt-1">
               قم بتعديل معلومات رمز الدعوة
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-5 py-4">
+          <div className="space-y-6 py-5">
             <div className="space-y-3">
-              <Label htmlFor="edit-code" className="text-dashboard-text font-medium">رمز الدعوة</Label>
+              <Label htmlFor="edit-code" className="text-dashboard-text font-medium flex items-center">
+                <TicketIcon className="h-4 w-4 ml-2 text-primary-500" />
+                رمز الدعوة
+              </Label>
               <Input
                 id="edit-code"
                 placeholder="أدخل رمز الدعوة"
                 value={editCode.code}
                 onChange={(e) => setEditCode({ ...editCode, code: e.target.value })}
-                className="bg-white border-gray-200 focus:border-primary-300 focus:ring-primary-300 text-dashboard-text h-12 text-lg shadow-sm"
+                className="bg-white border-gray-200 focus:border-primary-400 focus:ring-primary-400 text-dashboard-text h-12 text-lg shadow-sm rounded-lg"
               />
             </div>
             
             <div className="pt-2">
-              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between bg-blue-50 p-4 rounded-lg border border-blue-100 transition-all hover:bg-blue-100/50">
                 <Label 
                   htmlFor="is-active" 
-                  className="text-dashboard-text font-medium cursor-pointer select-none"
+                  className="text-dashboard-text font-medium cursor-pointer select-none flex items-center"
                 >
-                  رمز نشط
+                  <CheckCircleIcon className="h-4 w-4 ml-2 text-blue-600" />
+                  <span>حالة الرمز</span>
+                  <span className="mr-2 text-xs bg-blue-600 text-white rounded-full px-2 py-0.5">
+                    {editCode.isActive ? 'نشط' : 'غير نشط'}
+                  </span>
                 </Label>
-                <Switch
+                <MuiSwitch
                   id="is-active"
                   checked={editCode.isActive}
-                  onCheckedChange={(checked) => setEditCode({ ...editCode, isActive: checked })}
-                  className="data-[state=checked]:bg-primary-500"
+                  onChange={(e) => setEditCode({ ...editCode, isActive: e.target.checked })}
+                  sx={{
+                    width: 42,
+                    height: 22,
+                    padding: 0,
+                    transform: 'scaleX(-1)',
+                    '& .MuiSwitch-switchBase': {
+                      padding: 0,
+                      margin: '1px',
+                      transitionDuration: '300ms',
+                      '&.Mui-checked': {
+                        transform: 'translateX(20px)',
+                        color: '#fff',
+                        '& + .MuiSwitch-track': {
+                          backgroundColor: '#1d4ed8',
+                          opacity: 1,
+                          border: 0,
+                        },
+                      },
+                      '&.Mui-focusVisible .MuiSwitch-thumb': {
+                        border: '2px solid #fff',
+                        boxShadow: '0 0 0 4px rgba(29, 78, 216, 0.2)',
+                      },
+                    },
+                    '& .MuiSwitch-thumb': {
+                      boxSizing: 'border-box',
+                      width: 20,
+                      height: 20,
+                      boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)',
+                    },
+                    '& .MuiSwitch-track': {
+                      borderRadius: 11,
+                      backgroundColor: 'rgba(0,0,0,0.2)',
+                      opacity: 1,
+                      transition: 'background-color 0.2s, opacity 0.2s',
+                    },
+                    '&:hover': {
+                      '& .MuiSwitch-track': {
+                        backgroundColor: 'rgba(0,0,0,0.3)',
+                      },
+                      '& .Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#1e40af !important',
+                      },
+                    },
+                  }}
                 />
               </div>
-              <p className="text-xs text-dashboard-text-muted mt-2">
+              <p className="text-xs text-dashboard-text-muted mt-2 mr-1 flex items-center">
+                <AlertCircleIcon className="h-3 w-3 ml-1 text-gray-400" />
                 الرموز غير النشطة لا يمكن استخدامها للمسح
               </p>
             </div>
           </div>
-          <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+          <DialogFooter dir="rtl" className="flex flex-row-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t border-gray-100">
             <Button 
               onClick={handleEditCode}
-              className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm h-11"
+              className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm h-11 px-5 rounded-lg transition-colors"
             >
+              <CheckCircleIcon className="h-5 w-5 ml-2" />
               حفظ التغييرات
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setEditDialogOpen(false)}
-              className="bg-white border-gray-200 text-dashboard-text hover:bg-gray-50 h-11"
+              className="bg-white border-gray-200 text-dashboard-text hover:bg-gray-50 h-11 px-5 rounded-lg transition-colors"
             >
               إلغاء
             </Button>
