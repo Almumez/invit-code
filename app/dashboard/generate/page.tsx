@@ -24,6 +24,7 @@ import {
   BarChart2,
   Sparkles
 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export default function GeneratePage() {
   const { generateInviteCodes, inviteCodes } = useInviteStore()
@@ -35,6 +36,11 @@ export default function GeneratePage() {
   const [generationSuccess, setGenerationSuccess] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [generationProgress, setGenerationProgress] = useState(0)
+  
+  // إضافة خيارات تخصيص رموز الدعوة
+  const [includeNumbers, setIncludeNumbers] = useState(true)
+  const [includeUppercase, setIncludeUppercase] = useState(true)
+  const [includeLowercase, setIncludeLowercase] = useState(false)
   
   // تتبع تقدم عملية التوليد
   useEffect(() => {
@@ -56,13 +62,27 @@ export default function GeneratePage() {
   const handleGenerateCodes = async () => {
     if (generationCount <= 0 || codeLength <= 0) return
     
+    // التحقق من تحديد خيار واحد على الأقل
+    if (!includeNumbers && !includeUppercase && !includeLowercase) {
+      alert("يجب اختيار نوع واحد على الأقل من أنواع الحروف/الأرقام")
+      return
+    }
+    
     setIsGenerating(true)
     setGenerationSuccess(false)
     setShowPopup(true)
     setGenerationProgress(0)
     
     try {
-      await generateInviteCodes(generationCount, codeLength)
+      await generateInviteCodes(
+        generationCount, 
+        codeLength, 
+        { 
+          includeNumbers, 
+          includeUppercase, 
+          includeLowercase 
+        }
+      )
       setGenerationSuccess(true)
       
       // إغلاق الـ popup بعد اكتمال العملية
@@ -173,10 +193,58 @@ export default function GeneratePage() {
                 />
                 <p className="text-xs text-dashboard-text-muted">أدخل طول كل رمز (من 4 إلى 16 حرف/رقم)</p>
               </div>
+              
+              <div className="space-y-2">
+                <Label className="text-dashboard-text">خيارات تخصيص الرموز</Label>
+                <div className="space-y-2 mt-2">
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <Checkbox 
+                      id="include-numbers" 
+                      checked={includeNumbers} 
+                      onCheckedChange={setIncludeNumbers}
+                    />
+                    <Label 
+                      htmlFor="include-numbers" 
+                      className="text-dashboard-text cursor-pointer"
+                    >
+                      أرقام (0-9)
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <Checkbox 
+                      id="include-uppercase" 
+                      checked={includeUppercase} 
+                      onCheckedChange={setIncludeUppercase}
+                    />
+                    <Label 
+                      htmlFor="include-uppercase" 
+                      className="text-dashboard-text cursor-pointer"
+                    >
+                      أحرف كبيرة (A-Z)
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <Checkbox 
+                      id="include-lowercase" 
+                      checked={includeLowercase} 
+                      onCheckedChange={setIncludeLowercase}
+                    />
+                    <Label 
+                      htmlFor="include-lowercase" 
+                      className="text-dashboard-text cursor-pointer"
+                    >
+                      أحرف صغيرة (a-z)
+                    </Label>
+                  </div>
+                </div>
+                <p className="text-xs text-dashboard-text-muted mt-1">يجب اختيار نوع واحد على الأقل</p>
+              </div>
 
               <Button 
                 onClick={handleGenerateCodes} 
-                disabled={isGenerating || generationCount <= 0 || generationCount > 1000 || codeLength < 4 || codeLength > 16}
+                disabled={isGenerating || generationCount <= 0 || generationCount > 1000 || codeLength < 4 || codeLength > 16 || (!includeNumbers && !includeUppercase && !includeLowercase)}
                 className="mt-4 bg-dashboard-accent hover:bg-dashboard-accent-hover text-white shadow-sm"
               >
                 {isGenerating ? (
@@ -205,7 +273,7 @@ export default function GeneratePage() {
               <ul className="space-y-3 text-dashboard-text-muted">
                 <li className="flex items-start">
                   <div className="ml-2 mt-1 h-2 w-2 rounded-full bg-primary-500"></div>
-                  <span>يتم توليد الرموز باستخدام أحرف إنجليزية كبيرة وأرقام</span>
+                  <span>يمكنك تخصيص الرموز باستخدام أرقام وأحرف إنجليزية كبيرة وصغيرة</span>
                 </li>
                 <li className="flex items-start">
                   <div className="ml-2 mt-1 h-2 w-2 rounded-full bg-primary-500"></div>

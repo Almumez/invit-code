@@ -51,7 +51,11 @@ type InviteStore = {
   updateInviteCode: (id: string, data: Partial<InviteCode>) => Promise<void>
   deleteInviteCode: (id: string) => Promise<void>
   verifyInviteCode: (code: string) => Promise<boolean>
-  generateInviteCodes: (count: number, length: number) => Promise<void>
+  generateInviteCodes: (count: number, length: number, options?: { 
+    includeNumbers?: boolean, 
+    includeUppercase?: boolean,
+    includeLowercase?: boolean
+  }) => Promise<void>
   scanInviteCode: (code: string) => Promise<{success: boolean, message: string}>
 }
 
@@ -217,13 +221,17 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
     }
   },
 
-  generateInviteCodes: async (count: number, length: number) => {
+  generateInviteCodes: async (count: number, length: number, options = { 
+    includeNumbers: true, 
+    includeUppercase: true,
+    includeLowercase: false
+  }) => {
     set({ isLoading: true, error: null })
     try {
       const response = await fetch('/api/invite-codes/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ count, length })
+        body: JSON.stringify({ count, length, options })
       })
       if (!response.ok) throw new Error('فشل في توليد رموز الدعوة')
       await get().fetchInviteCodes()
