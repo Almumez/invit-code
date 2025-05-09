@@ -137,6 +137,30 @@ export default function DashboardLayout({
               </button>
             </div>
           </div>
+
+          {/* Developer Info */}
+          <div className="mt-auto p-4 border-t border-dashboard-border">
+            <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-4 shadow-sm">
+              <div className="flex items-center justify-center mb-3">
+                <div className="h-12 w-12 bg-white rounded-full overflow-hidden flex items-center justify-center shadow-sm border-2 border-primary-200">
+                  <span className="text-primary-600 font-bold text-xl">A</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h4 className="font-medium text-dashboard-text">تطوير وتصميم</h4>
+                <p className="text-sm text-dashboard-text-muted mb-3">عبدالخالق الحرازي</p>
+                <a 
+                  href="https://protfilo-xi.vercel.app/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center justify-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-primary-200 text-sm text-primary-600 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-colors shadow-sm"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  <span>معرض الأعمال</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main content */}

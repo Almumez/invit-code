@@ -6,7 +6,8 @@ import { useVisitStore } from '@/lib/store/visit-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
-import { CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material'
+import { CheckCircle, Cancel } from '@mui/icons-material'
+import { TicketIcon, SearchIcon, CheckIcon, XIcon, LoaderIcon } from 'lucide-react'
 import React from 'react'
 
 export default function HomePage() {
@@ -70,51 +71,69 @@ export default function HomePage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-dashboard-text mb-4 pulse-animation">
-            <AutoAwesome className="inline-block ml-2 h-8 w-8" />
+          <div className="inline-block p-3 rounded-full bg-primary-50 mb-4">
+            <TicketIcon className="h-10 w-10 text-primary-600" />
+          </div>
+          <h1 className="text-4xl font-bold text-dashboard-text mb-3">
             نظام مسح رموز الدعوة
           </h1>
-          <p className="text-xl text-dashboard-text-muted">أدخل رمز الدعوة لمسحه</p>
+          <p className="text-lg text-dashboard-text-muted">أدخل رمز الدعوة لمسحه والتحقق من صلاحيته</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>مسح الرمز</CardTitle>
-            <CardDescription>
-              أدخل رمز الدعوة الذي تريد مسحه
+        <Card className="border-dashboard-border shadow-md overflow-hidden">
+          <CardHeader className="bg-white border-b border-dashboard-border">
+            <CardTitle className="text-xl font-semibold text-dashboard-text flex items-center">
+              <SearchIcon className="h-5 w-5 ml-2 text-primary-500" />
+              مسح الرمز
+            </CardTitle>
+            <CardDescription className="text-dashboard-text-muted">
+              أدخل رمز الدعوة الذي تريد التحقق منه
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6 bg-white">
             <div className="space-y-6">
               <div className="space-y-4">
-                <Input
-                  id="code"
-                  placeholder="أدخل رمز الدعوة"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  disabled={isLoading}
-                  onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-                  className="w-full"
-                  dir="rtl"
-                />
+                <div className="relative">
+                  <TicketIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary-500" />
+                  <Input
+                    id="code"
+                    placeholder="أدخل رمز الدعوة"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    disabled={isLoading}
+                    onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+                    className="bg-white border-gray-200 focus:border-primary-400 focus:ring-primary-400 text-dashboard-text pr-12 h-12 text-lg w-full shadow-sm rounded-lg"
+                    dir="rtl"
+                  />
+                </div>
                 <Button 
                   onClick={handleScan} 
                   disabled={isLoading || !code.trim()}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-primary-600 hover:bg-primary-700 text-white h-12 rounded-lg font-medium shadow-sm transition-colors"
                 >
-                  {isLoading ? 'جاري المسح...' : 'مسح الرمز'}
+                  {isLoading ? (
+                    <>
+                      <LoaderIcon className="h-5 w-5 ml-2 animate-spin" />
+                      جاري المسح...
+                    </>
+                  ) : (
+                    <>
+                      <SearchIcon className="h-5 w-5 ml-2" />
+                      مسح الرمز
+                    </>
+                  )}
                 </Button>
               </div>
 
               {result.checked && (
-                <div className={`p-5 rounded-lg flex items-center ${
+                <div className={`p-5 rounded-lg flex items-center shadow-sm ${
                   result.valid 
                     ? 'bg-green-50 text-green-700 border border-green-200' 
                     : 'bg-red-50 text-red-700 border border-red-200'
                 }`}>
                   {result.valid 
-                    ? <CheckCircle color="success" className="h-6 w-6 ml-3 flex-shrink-0" /> 
-                    : <Cancel color="error" className="h-6 w-6 ml-3 flex-shrink-0" />
+                    ? <CheckIcon className="h-6 w-6 ml-3 flex-shrink-0 text-green-600" /> 
+                    : <XIcon className="h-6 w-6 ml-3 flex-shrink-0 text-red-600" />
                   }
                   <div className="flex flex-col">
                     <span className="text-lg font-medium">
@@ -128,6 +147,11 @@ export default function HomePage() {
               )}
             </div>
           </CardContent>
+          <CardFooter className="bg-gray-50 border-t border-dashboard-border py-4">
+            <p className="text-xs text-dashboard-text-muted w-full text-center">
+              قم بإدخال رمز الدعوة للتحقق من صلاحيته وإمكانية استخدامه
+            </p>
+          </CardFooter>
         </Card>
       </div>
     </div>
