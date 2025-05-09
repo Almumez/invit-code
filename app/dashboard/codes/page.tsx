@@ -363,43 +363,64 @@ export default function InviteCodesPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="w-full text-right">
                 <TableHeader>
-                  <TableRow className="border-dashboard-border hover:bg-dashboard-bg">
-                    <TableHead className="text-dashboard-text-muted">الرمز</TableHead>
-                    <TableHead className="text-dashboard-text-muted">الحالة</TableHead>
-                    <TableHead className="text-dashboard-text-muted">حالة المسح</TableHead>
-                    <TableHead className="text-dashboard-text-muted">تاريخ الإنشاء</TableHead>
-                    <TableHead className="text-dashboard-text-muted text-left">الإجراءات</TableHead>
+                  <TableRow className="bg-dashboard-bg border-b border-dashboard-border hover:bg-dashboard-bg/70">
+                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/4 text-center">الرمز</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">الحالة</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">حالة المسح</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/4 text-center">تاريخ الإنشاء</TableHead>
+                    <TableHead className="text-dashboard-text-muted font-medium py-3 px-4 w-1/6 text-center">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {inviteCodes.map((code) => (
-                    <TableRow key={code.id} className="border-dashboard-border hover:bg-dashboard-bg">
-                      <TableCell className="font-medium text-dashboard-text">{code.code}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                          code.isActive 
-                            ? 'bg-green-100 text-green-700 border border-green-200' 
-                            : 'bg-red-100 text-red-700 border border-red-200'
-                        }`}>
-                          {code.isActive ? 'مفعّل' : 'غير مفعّل'}
-                        </span>
+                  {inviteCodes.map((code, index) => (
+                    <TableRow 
+                      key={code.id} 
+                      className={`border-b border-dashboard-border transition-colors hover:bg-dashboard-bg/50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
+                    >
+                      <TableCell className="font-medium text-dashboard-text py-3 px-4 text-center">
+                        {code.code}
                       </TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                          !code.isActive 
-                            ? 'bg-blue-100 text-blue-700 border border-blue-200' 
-                            : 'bg-gray-100 text-gray-700 border border-gray-200'
-                        }`}>
-                          {!code.isActive ? 'تم المسح' : 'لم يتم المسح'}
-                        </span>
+                      <TableCell className="py-3 px-4 text-center">
+                        <div className="flex justify-center">
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
+                            ${code.isActive 
+                              ? 'bg-green-100 text-green-700 border border-green-200 shadow-sm' 
+                              : 'bg-red-100 text-red-700 border border-red-200 shadow-sm'
+                            }`}
+                          >
+                            {code.isActive ? 'مفعّل' : 'غير مفعّل'}
+                          </span>
+                        </div>
                       </TableCell>
-                      <TableCell className="text-dashboard-text-muted">
+                      <TableCell className="py-3 px-4 text-center">
+                        <div className="flex justify-center">
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
+                            ${!code.isActive 
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200 shadow-sm' 
+                              : 'bg-gray-100 text-gray-700 border border-gray-200 shadow-sm'
+                            }`}
+                          >
+                            {!code.isActive ? 'تم المسح' : 'لم يتم المسح'}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-dashboard-text-muted py-3 px-4 text-center">
                         {formatDate(code.createdAt)}
                       </TableCell>
-                      <TableCell className="text-left">
-                        <div className="flex justify-end gap-2">
+                      <TableCell className="py-3 px-4 text-center">
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-primary-500"
+                            onClick={() => openEditDialog(code)}
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                            <span className="sr-only">تعديل</span>
+                          </Button>
+                          
                           <AlertDialog 
                             open={deleteDialogOpen.open && deleteDialogOpen.codeId === code.id} 
                             onOpenChange={(open) => setDeleteDialogOpen({open, codeId: open ? code.id : null})}
@@ -408,7 +429,7 @@ export default function InviteCodesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-dashboard-text hover:bg-dashboard-bg"
+                                className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-red-500"
                               >
                                 <TrashIcon className="h-4 w-4" />
                                 <span className="sr-only">حذف</span>
@@ -434,16 +455,6 @@ export default function InviteCodesPage() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-dashboard-text-muted hover:text-dashboard-text hover:bg-dashboard-bg"
-                            onClick={() => openEditDialog(code)}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                            <span className="sr-only">تعديل</span>
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
