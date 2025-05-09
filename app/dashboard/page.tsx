@@ -138,9 +138,23 @@ export default function DashboardPage() {
   
   return (
     <div className="space-y-8">
-      {/* Header & Statistics */}
+      {/* Header Banner */}
+      <Card className="border-0 bg-gradient-to-r from-primary-500/90 to-primary-700 text-white shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold mb-2">مرحباً بك في لوحة التحكم</h1>
+              <p className="text-white/80">
+                هنا يمكنك إدارة رموز الدعوة ومتابعة الإحصائيات
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="materio-card">
+        <Card className="bg-white shadow-md border-dashboard-border hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
@@ -154,7 +168,7 @@ export default function DashboardPage() {
                   جميع الرموز في النظام
                 </div>
               </div>
-              <div className="materio-gradient-primary w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="bg-gradient-to-r from-primary-500 to-primary-600 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
                 <TicketIcon className="w-6 h-6 text-white" />
               </div>
             </div>
@@ -162,7 +176,7 @@ export default function DashboardPage() {
         </Card>
         
         {/* كارد الرموز المتبقية */}
-        <Card className="materio-card">
+        <Card className="bg-white shadow-md border-dashboard-border hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
@@ -176,15 +190,15 @@ export default function DashboardPage() {
                   <span className="text-green-500">{activePercentage}%</span> من إجمالي الرموز
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-green-500 to-emerald-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
                 <TicketIcon className="w-6 h-6 text-white" />
               </div>
             </div>
             
             {/* شريط تقدم المتبقي */}
             <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${activePercentage}%` }}></div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2">
+                <div className="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full" style={{ width: `${activePercentage}%` }}></div>
               </div>
               <div className="flex justify-between text-xs text-dashboard-text-muted">
                 <div>نسبة المتبقي</div>
@@ -195,7 +209,7 @@ export default function DashboardPage() {
         </Card>
         
         {/* كارد الرموز التي تم مسحها */}
-        <Card className="materio-card">
+        <Card className="bg-white shadow-md border-dashboard-border hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
@@ -206,18 +220,18 @@ export default function DashboardPage() {
                   ) : stats.codes.used}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  <span className="text-blue-500">{scannedPercentage}%</span> من إجمالي الرموز
+                  <span className="text-primary-600">{scannedPercentage}%</span> من إجمالي الرموز
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="bg-gradient-to-r from-primary-400 to-primary-600 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
                 <BarChart4 className="w-6 h-6 text-white" />
               </div>
             </div>
             
             {/* شريط تقدم المستخدم */}
             <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${scannedPercentage}%` }}></div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2">
+                <div className="bg-gradient-to-r from-primary-400 to-primary-600 h-2.5 rounded-full" style={{ width: `${scannedPercentage}%` }}></div>
               </div>
               <div className="flex justify-between text-xs text-dashboard-text-muted">
                 <div>نسبة المسح</div>
@@ -228,7 +242,7 @@ export default function DashboardPage() {
         </Card>
         
         {/* كارد الزيارات */}
-        <Card className="materio-card">
+        <Card className="bg-white shadow-md border-dashboard-border hover:shadow-lg transition-shadow">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
@@ -240,28 +254,22 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
                   <span className="text-green-500">+{stats.visits.today}</span> اليوم،{' '}
-                  <span className="text-blue-500">{stats.visits.week}</span> هذا الأسبوع
+                  <span className="text-primary-600">{stats.visits.week}</span> هذا الأسبوع
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-500 to-fuchsia-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
                 <Globe className="w-6 h-6 text-white" />
               </div>
             </div>
             
-            {/* شريط تقدم الزيارات اليوم مقارنة بالأسبوع */}
+            {/* شريط تقدم الزيارات */}
             <div className="mt-4">
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div 
-                  className="bg-purple-500 h-2.5 rounded-full" 
-                  style={{ width: `${stats.visits.week ? Math.min(100, (stats.visits.today / stats.visits.week) * 100) : 0}%` }}
-                ></div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2">
+                <div className="bg-gradient-to-r from-purple-400 to-purple-600 h-2.5 rounded-full" style={{ width: `${Math.min(stats.visits.week / (stats.visits.total || 1) * 100, 100)}%` }}></div>
               </div>
               <div className="flex justify-between text-xs text-dashboard-text-muted">
-                <div>اليوم</div>
-                <div className="font-medium">
-                  {isLoadingDashboard ? '...' : stats.visits.week ? 
-                    Math.round((stats.visits.today / stats.visits.week) * 100) : 0}% من الأسبوع
-                </div>
+                <div>زيارات الأسبوع</div>
+                <div className="font-medium">{Math.round(stats.visits.week / (stats.visits.total || 1) * 100)}%</div>
               </div>
             </div>
           </CardContent>
