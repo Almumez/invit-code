@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const ip = request.headers.get('x-forwarded-for') || request.ip || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
+    // نسجل كل الزيارات ولا نمنع التكرار بناءً على IP
     const visit = await prisma.visit.create({
       data: {
         path,

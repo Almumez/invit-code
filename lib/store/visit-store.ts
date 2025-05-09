@@ -13,9 +13,10 @@ interface VisitState {
   stats: VisitStats
   fetchVisitStats: () => Promise<void>
   recordVisit: (path: string) => Promise<void>
+  recordedPaths: Set<string>
 }
 
-export const useVisitStore = create<VisitState>((set) => ({
+export const useVisitStore = create<VisitState>((set, get) => ({
   isLoading: false,
   error: null,
   stats: {
@@ -24,6 +25,7 @@ export const useVisitStore = create<VisitState>((set) => ({
     weekly: 0,
     paths: []
   },
+  recordedPaths: new Set<string>(),
   
   fetchVisitStats: async () => {
     set({ isLoading: true, error: null })
@@ -50,7 +52,16 @@ export const useVisitStore = create<VisitState>((set) => ({
   },
   
   recordVisit: async (path: string) => {
+    if (get().recordedPaths.has(path)) {
+      console.log(`Skipping duplicate visit record for: ${path}`);
+      return;
+    }
+    
     try {
+      set(state => ({ 
+        recordedPaths: new Set(state.recordedPaths).add(path) 
+      }));
+      
       const response = await fetch('/api/visits', {
         method: 'POST',
         headers: {

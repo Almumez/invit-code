@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useInviteStore } from '@/lib/store/invite-store'
 import { useVisitStore } from '@/lib/store/visit-store'
+import React from 'react'
 import { 
   Card, 
   CardContent, 
@@ -27,9 +28,15 @@ export default function DashboardPage() {
   const { inviteCodes, isLoading: isLoadingInvites, fetchInviteCodes } = useInviteStore()
   const { stats, isLoading: isLoadingVisits, fetchVisitStats } = useVisitStore()
   
+  // استخدام useRef لمنع تكرار الاستدعاء
+  const initialized = React.useRef(false);
+  
   useEffect(() => {
-    fetchInviteCodes()
-    fetchVisitStats()
+    if (!initialized.current) {
+      fetchInviteCodes()
+      fetchVisitStats()
+      initialized.current = true;
+    }
   }, [fetchInviteCodes, fetchVisitStats])
   
   // إحصائيات للرموز

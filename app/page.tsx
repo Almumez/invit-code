@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
 import { CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material'
+import React from 'react'
 
 export default function HomePage() {
   const { scanInviteCode } = useInviteStore()
@@ -23,9 +24,14 @@ export default function HomePage() {
     checked: false
   })
   
-  // تسجيل زيارة عند فتح الصفحة
+  // تسجيل زيارة عند فتح الصفحة - استخدام useRef لضمان عدم تكرار الاستدعاء
+  const visitRecorded = React.useRef(false);
+  
   useEffect(() => {
-    recordVisit('/')
+    if (!visitRecorded.current) {
+      recordVisit('/')
+      visitRecorded.current = true;
+    }
   }, [recordVisit])
   
   const handleScan = async () => {
