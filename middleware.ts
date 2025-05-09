@@ -28,15 +28,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(dashboardUrl)
   }
   
-  // إذا كان المستخدم في الجذر، قم بإعادة توجيهه إلى لوحة التحكم إذا كان مسجل الدخول أو إلى صفحة تسجيل الدخول إذا لم يكن كذلك
-  if (request.nextUrl.pathname === '/') {
-    if (isUserLoggedIn) {
-      const dashboardUrl = new URL('/dashboard', request.url)
-      return NextResponse.redirect(dashboardUrl)
-    } else {
-      const loginUrl = new URL('/login', request.url)
-      return NextResponse.redirect(loginUrl)
-    }
+  // السماح بالوصول إلى الصفحة الرئيسية دون تسجيل الدخول
+  // إذا كان المستخدم مسجل الدخول ويحاول الوصول إلى الصفحة الرئيسية، وجهه إلى لوحة التحكم
+  if (request.nextUrl.pathname === '/' && isUserLoggedIn) {
+    const dashboardUrl = new URL('/dashboard', request.url)
+    return NextResponse.redirect(dashboardUrl)
   }
   
   return NextResponse.next()
