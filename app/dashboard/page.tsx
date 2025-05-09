@@ -34,6 +34,10 @@ export default function DashboardPage() {
   const activeCodes = inviteCodes.filter(code => code.isActive).length
   const scannedCodes = inviteCodes.filter(code => !code.isActive).length
   
+  // نسبة الرموز المستخدمة
+  const scannedPercentage = totalCodes > 0 ? Math.round((scannedCodes / totalCodes) * 100) : 0
+  const activePercentage = totalCodes > 0 ? Math.round((activeCodes / totalCodes) * 100) : 0
+  
   return (
     <div className="space-y-8">
       {/* Header & Statistics */}
@@ -47,8 +51,7 @@ export default function DashboardPage() {
                   {totalCodes}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  <span className="text-green-500">+{activeCodes}</span> نشطة،{' '}
-                  <span className="text-blue-500">{scannedCodes}</span> مستخدمة
+                  جميع الرموز في النظام
                 </div>
               </div>
               <div className="materio-gradient-primary w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
@@ -58,39 +61,63 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
+        {/* كارد الرموز المتبقية */}
         <Card className="materio-card">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-dashboard-text-muted text-sm font-medium mb-1">المستخدمين</div>
+                <div className="text-dashboard-text-muted text-sm font-medium mb-1">الرموز المتبقية</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  18
+                  {activeCodes}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  <span className="text-green-500">+4</span> هذا الأسبوع
+                  <span className="text-green-500">{activePercentage}%</span> من إجمالي الرموز
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
-                <Users className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-br from-green-500 to-emerald-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+                <TicketIcon className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            
+            {/* شريط تقدم المتبقي */}
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${activePercentage}%` }}></div>
+              </div>
+              <div className="flex justify-between text-xs text-dashboard-text-muted">
+                <div>نسبة المتبقي</div>
+                <div className="font-medium">{activePercentage}%</div>
               </div>
             </div>
           </CardContent>
         </Card>
         
+        {/* كارد الرموز التي تم مسحها */}
         <Card className="materio-card">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-dashboard-text-muted text-sm font-medium mb-1">معدل الاستخدام</div>
+                <div className="text-dashboard-text-muted text-sm font-medium mb-1">الرموز المستخدمة</div>
                 <div className="text-3xl font-bold text-dashboard-text mb-2">
-                  {scannedCodes > 0 ? Math.round((scannedCodes / totalCodes) * 100) : 0}%
+                  {scannedCodes}
                 </div>
                 <div className="text-xs text-dashboard-text-muted">
-                  معدل الاستخدام اليومي
+                  <span className="text-blue-500">{scannedPercentage}%</span> من إجمالي الرموز
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-blue-500 to-cyan-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-400 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm">
                 <BarChart4 className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            
+            {/* شريط تقدم المستخدم */}
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${scannedPercentage}%` }}></div>
+              </div>
+              <div className="flex justify-between text-xs text-dashboard-text-muted">
+                <div>نسبة المسح</div>
+                <div className="font-medium">{scannedPercentage}%</div>
               </div>
             </div>
           </CardContent>
@@ -133,11 +160,54 @@ export default function DashboardPage() {
                     <LoaderIcon className="h-8 w-8 animate-spin text-primary-500" />
                   </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-dashboard-text-muted">
-                    <div className="text-center">
-                      <BarChart4 className="h-16 w-16 mx-auto mb-4 text-primary-100" />
-                      <p className="text-lg font-medium">إحصائيات الاستخدام</p>
-                      <p className="text-sm">سيتم عرض الرسم البياني قريبًا</p>
+                  <div className="flex items-center justify-center h-full">
+                    <div className="w-40 h-40 relative">
+                      {/* دائرة رسم بياني بسيطة */}
+                      <svg className="w-full h-full" viewBox="0 0 36 36">
+                        <path 
+                          className="stroke-current text-blue-100 fill-none" 
+                          strokeWidth="3.8" 
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path 
+                          className="stroke-current text-indigo-500 fill-none" 
+                          strokeWidth="3.8" 
+                          strokeDasharray={`${scannedPercentage}, 100`}
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <text x="18" y="20.5" className="fill-current text-dashboard-text text-lg font-medium" textAnchor="middle">
+                          {scannedPercentage}%
+                        </text>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-dashboard-text">{scannedPercentage}%</div>
+                          <div className="text-xs text-dashboard-text-muted">تم المسح</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="ml-8">
+                      <div className="space-y-3">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+                          <div className="text-sm text-dashboard-text-muted">
+                            تم مسحها <span className="font-medium text-dashboard-text">{scannedCodes}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full bg-blue-100 mr-2"></div>
+                          <div className="text-sm text-dashboard-text-muted">
+                            متبقية <span className="font-medium text-dashboard-text">{activeCodes}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full bg-gray-200 mr-2"></div>
+                          <div className="text-sm text-dashboard-text-muted">
+                            المجموع <span className="font-medium text-dashboard-text">{totalCodes}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
