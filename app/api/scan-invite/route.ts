@@ -34,18 +34,14 @@ export async function POST(request: Request) {
       )
     }
 
-    // التحقق مما إذا كان الرمز تم مسحه بالفعل
-    if (inviteCode.isScanned) {
-      return NextResponse.json(
-        { success: false, message: 'تم مسح رمز الدعوة بالفعل' },
-        { status: 400 }
-      )
-    }
-
-    // تحديث حالة الرمز إلى ممسوح
+    // بدلاً من استخدام حقل isScanned، سنعتبر الرمز تم مسحه إذا كان غير نشط
+    // تحديث حالة الرمز إلى غير نشط لدلالة على أنه تم مسحه
     const updatedCode = await prisma.inviteCode.update({
       where: { id: inviteCode.id },
-      data: { isScanned: true }
+      data: { 
+        isActive: false,
+        updatedAt: new Date() // تحديث وقت التعديل
+      }
     })
 
     return NextResponse.json({

@@ -319,11 +319,11 @@ export default function DashboardPage() {
                       </TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                          code.isScanned 
+                          !code.isActive 
                             ? 'bg-blue-100 text-blue-700 border border-blue-200' 
                             : 'bg-gray-100 text-gray-700 border border-gray-200'
                         }`}>
-                          {code.isScanned ? 'تم المسح' : 'لم يتم المسح'}
+                          {!code.isActive ? 'تم المسح' : 'لم يتم المسح'}
                         </span>
                       </TableCell>
                       <TableCell className="text-dashboard-text-muted">

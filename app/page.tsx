@@ -5,11 +5,10 @@ import { useInviteStore } from '@/lib/store/invite-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
-import { CheckCircle, Cancel, ArrowForward, AutoAwesome } from '@mui/icons-material'
-import Link from 'next/link'
+import { CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material'
 
 export default function HomePage() {
-  const { verifyInviteCode, scanInviteCode } = useInviteStore()
+  const { scanInviteCode } = useInviteStore()
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<{ 
@@ -21,21 +20,6 @@ export default function HomePage() {
     valid: false,
     checked: false
   })
-
-  const handleVerify = async () => {
-    if (!code.trim()) return
-    
-    setIsLoading(true)
-    try {
-      const isValid = await verifyInviteCode(code.trim())
-      setResult({ valid: isValid, checked: true })
-    } catch (error) {
-      console.error('Error verifying code:', error)
-      setResult({ valid: false, checked: true })
-    } finally {
-      setIsLoading(false)
-    }
-  }
   
   const handleScan = async () => {
     if (!code.trim()) return
@@ -75,16 +59,16 @@ export default function HomePage() {
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-dashboard-text mb-4 pulse-animation">
             <AutoAwesome className="inline-block ml-2 h-8 w-8" />
-            نظام التحقق من رموز الدعوة
+            نظام مسح رموز الدعوة
           </h1>
-          <p className="text-xl text-dashboard-text-muted">أدخل رمز الدعوة للتحقق من صلاحيته</p>
+          <p className="text-xl text-dashboard-text-muted">أدخل رمز الدعوة لمسحه</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>التحقق من الرمز</CardTitle>
+            <CardTitle>مسح الرمز</CardTitle>
             <CardDescription>
-              أدخل رمز الدعوة الذي استلمته
+              أدخل رمز الدعوة الذي تريد مسحه
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -96,28 +80,17 @@ export default function HomePage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   disabled={isLoading}
-                  onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleScan()}
                   className="w-full"
                   dir="rtl"
                 />
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleVerify} 
-                    disabled={isLoading || !code.trim()}
-                    className="flex-1"
-                    variant="materio"
-                  >
-                    {isLoading ? 'جاري التحقق...' : 'التحقق من الرمز'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleScan} 
-                    disabled={isLoading || !code.trim()}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {isLoading ? 'جاري المسح...' : 'مسح الرمز'}
-                  </Button>
-                </div>
+                <Button 
+                  onClick={handleScan} 
+                  disabled={isLoading || !code.trim()}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isLoading ? 'جاري المسح...' : 'مسح الرمز'}
+                </Button>
               </div>
 
               {result.checked && (
@@ -132,12 +105,9 @@ export default function HomePage() {
                   }
                   <div className="flex flex-col">
                     <span className="text-lg font-medium">
-                      {result.isScanned 
-                        ? (result.valid ? 'تم مسح الرمز بنجاح!' : 'فشل في مسح الرمز')
-                        : (result.valid ? 'رمز دعوة صالح!' : 'رمز دعوة غير صالح أو غير مفعّل.')
-                      }
+                      {result.valid ? 'تم مسح الرمز بنجاح!' : 'فشل في مسح الرمز'}
                     </span>
-                    {result.isScanned && result.scanMessage && (
+                    {result.scanMessage && (
                       <span className="text-sm mt-1">{result.scanMessage}</span>
                     )}
                   </div>
@@ -145,15 +115,6 @@ export default function HomePage() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between border-t border-dashboard-border bg-dashboard-sidebar p-4">
-            <div className="text-sm text-dashboard-text-muted">هل تحتاج إلى رمز دعوة؟</div>
-            <Link 
-              href="/dashboard"
-              className="text-dashboard-accent hover:text-dashboard-accent-hover flex items-center gap-1 transition-colors"
-            >
-              لوحة التحكم <ArrowForward style={{ transform: 'scaleX(-1)' }} className="h-4 w-4" />
-            </Link>
-          </CardFooter>
         </Card>
       </div>
     </div>

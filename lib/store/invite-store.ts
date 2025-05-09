@@ -121,6 +121,11 @@ export const useInviteStore = create<InviteStore>((set, get) => ({
       })
       if (!response.ok) throw new Error('فشل في التحقق من رمز الدعوة')
       const data = await response.json()
+      
+      if (data.success) {
+        await get().fetchInviteCodes()
+      }
+      
       set({ isLoading: false })
       return data
     } catch (error) {
