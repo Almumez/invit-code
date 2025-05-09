@@ -16,6 +16,9 @@ export function middleware(request: NextRequest) {
   const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard')
   const isLoginRoute = request.nextUrl.pathname.startsWith('/login')
   
+  // التحقق مما إذا كان هناك معلمة في العنوان للسماح باستخدام الصفحة الرئيسية حتى للمستخدمين المسجلين
+  const hasFromDashboardParam = request.nextUrl.searchParams.has('from_dashboard')
+  
   // إذا كان المستخدم يحاول الوصول إلى لوحة التحكم وليس مصادقًا، قم بإعادة توجيهه إلى صفحة تسجيل الدخول
   if (isDashboardRoute && !isUserLoggedIn) {
     const loginUrl = new URL('/login', request.url)
@@ -28,9 +31,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(dashboardUrl)
   }
   
-  // السماح بالوصول إلى الصفحة الرئيسية دون تسجيل الدخول
-  // إذا كان المستخدم مسجل الدخول ويحاول الوصول إلى الصفحة الرئيسية، وجهه إلى لوحة التحكم
-  if (request.nextUrl.pathname === '/' && isUserLoggedIn) {
+  // السماح بالوصول إلى الصفحة الرئيسية إذا كان المستخدم غير مسجل أو إذا كان الوصول من لوحة التحكم
+  if (request.nextUrl.pathname === '/' && isUserLoggedIn && !hasFromDashboardParam) {
     const dashboardUrl = new URL('/dashboard', request.url)
     return NextResponse.redirect(dashboardUrl)
   }
