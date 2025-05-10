@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
-// منع توليد الصفحة بشكل ثابت لأننا نستخدم request.json()
-export const dynamic = 'force-dynamic'
-
 const prisma = new PrismaClient()
+
+// إضافة generateStaticParams للتوافق مع الإخراج الثابت
+export function generateStaticParams() {
+  return [{ id: 'static' }]
+}
 
 // Function to generate a random string of specified length with customization options
 function generateRandomCode(
@@ -77,10 +79,10 @@ export async function POST(request: Request) {
     }
 
     // Generate unique codes
-    const generatedCodes = []
+    const generatedCodes: string[] = []
     for (let i = 0; i < count; i++) {
-      let code
-      let isUnique = false
+      let code: string = '';
+      let isUnique = false;
       
       // Keep generating until we get a unique code
       while (!isUnique) {

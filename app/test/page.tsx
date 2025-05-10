@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select';
 
 export default function TestPage() {
   const [value, setValue] = useState('option1');
@@ -13,12 +13,16 @@ export default function TestPage() {
       <div className="w-64">
         <Select
           value={value}
-          onChange={(newValue) => setValue(newValue)}
-          placeholder="اختر خيارًا"
+          onValueChange={(newValue) => setValue(newValue)}
         >
-          <SelectItem value="option1">الخيار الأول</SelectItem>
-          <SelectItem value="option2">الخيار الثاني</SelectItem>
-          <SelectItem value="option3">الخيار الثالث</SelectItem>
+          <SelectTrigger>
+            <SelectValue placeholder="اختر خيارًا" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="option1">الخيار الأول</SelectItem>
+            <SelectItem value="option2">الخيار الثاني</SelectItem>
+            <SelectItem value="option3">الخيار الثالث</SelectItem>
+          </SelectContent>
         </Select>
       </div>
       

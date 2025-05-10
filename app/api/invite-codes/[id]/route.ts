@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// إضافة generateStaticParams للتوافق مع الإخراج الثابت
+export function generateStaticParams() {
+  return [{ id: 'static' }]
+}
+
 // GET /api/invite-codes/[id] - Get a specific invite code
 export async function GET(
   request: Request,

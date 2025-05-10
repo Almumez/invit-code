@@ -37,16 +37,15 @@ interface AlertDialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonE
 const AlertDialogTrigger = React.forwardRef<
   HTMLButtonElement,
   AlertDialogTriggerProps
->(({ onClick, children, className, ...props }, ref) => (
-  <Button
+>(({ onClick, children, className, asChild, ...props }, ref) => (
+  <button
     ref={ref}
     onClick={onClick}
-    className={cn(className)}
-    variant="contained"
+    className={cn("inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-white", className)}
     {...props}
   >
     {children}
-  </Button>
+  </button>
 ));
 AlertDialogTrigger.displayName = 'AlertDialogTrigger';
 
@@ -124,15 +123,13 @@ const AlertDialogAction = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className, children, ...props }, ref) => (
-  <Button
+  <button
     ref={ref}
-    variant="contained"
-    color="primary"
-    className={cn(className)}
+    className={cn("inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-white", className)}
     {...props}
   >
     {children}
-  </Button>
+  </button>
 ));
 AlertDialogAction.displayName = 'AlertDialogAction';
 
@@ -140,15 +137,13 @@ const AlertDialogCancel = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className, children, ...props }, ref) => (
-  <Button
+  <button
     ref={ref}
-    variant="outlined"
-    color="inherit"
-    className={cn('mt-2 sm:mt-0', className)}
+    className={cn('mt-2 sm:mt-0 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 font-medium', className)}
     {...props}
   >
     {children}
-  </Button>
+  </button>
 ));
 AlertDialogCancel.displayName = 'AlertDialogCancel';
 

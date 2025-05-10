@@ -163,7 +163,7 @@ export async function GET() {
     })
     
     // تجميع الزيارات حسب الساعة
-    const hoursByVisit = allVisits.reduce((acc, visit) => {
+    const hoursByVisit = allVisits.reduce<Record<number, number>>((acc, visit) => {
       const hour = new Date(visit.createdAt).getHours()
       if (!acc[hour]) {
         acc[hour] = 0

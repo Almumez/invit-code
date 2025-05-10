@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
+import MuiFormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import {
   Controller,
@@ -98,6 +98,7 @@ const FormLabel = React.forwardRef<
       ref={ref}
       className={cn(error && 'text-destructive', className)}
       htmlFor={formItemId}
+      component="label"
       {...props}
     />
   );

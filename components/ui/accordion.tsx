@@ -51,7 +51,7 @@ const Accordion = ({ className, children, ...props }: AccordionProps) => {
 interface AccordionItemProps {
   value: string;
   className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
   defaultExpanded?: boolean;
 }
 
@@ -66,14 +66,14 @@ const AccordionItem = React.forwardRef<
     defaultExpanded={defaultExpanded}
     {...props}
   >
-    {children}
+    {children as React.ReactElement}
   </StyledAccordion>
 ));
 AccordionItem.displayName = 'AccordionItem';
 
 interface AccordionTriggerProps {
   className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const AccordionTrigger = React.forwardRef<
@@ -89,14 +89,14 @@ const AccordionTrigger = React.forwardRef<
       )}
       {...props}
     >
-      {children}
+      {children as React.ReactElement}
   </StyledAccordionSummary>
 ));
 AccordionTrigger.displayName = 'AccordionTrigger';
 
 interface AccordionContentProps {
   className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const AccordionContent = React.forwardRef<
@@ -108,7 +108,7 @@ const AccordionContent = React.forwardRef<
     className={cn('text-sm', className)}
     {...props}
   >
-    {children}
+    {children as React.ReactElement}
   </StyledAccordionDetails>
 ));
 
